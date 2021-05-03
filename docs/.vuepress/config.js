@@ -20,7 +20,8 @@ module.exports = {
             children: [
                 "/basic/call&apply&bind/",
                 "/basic/js-prototype/",
-                "/basic/js-curry/"
+                "/basic/js-curry/",
+                "/basic/js-throttle&debounce/"
                 ]
             }
       ],
