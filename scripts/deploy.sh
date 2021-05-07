@@ -8,13 +8,13 @@ npm run build
 cd docs/.vuepress/dist
 
 # 如果是发布到自定义域名
-echo 'www.72lsy.vip' > CNAME
+# echo 'www.72lsy.vip' > CNAME
 
 git init
 git config user.name 'lazyChan297'
 git config user.email 'lazyChan297@163.com'
 git add -A
-git commit -m '基于 vuepress 开发的博客'
+git commit -m '297 blog'
 
 git push -f git@github.com:lazyChan297/lazyChan297.github.io.git master
 
