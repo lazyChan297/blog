@@ -22,7 +22,8 @@ module.exports = {
                 "/basic/js-prototype/",
                 "/basic/js-curry/",
                 "/basic/js-throttle&debounce/",
-                "/basic/js-clone/"
+                "/basic/js-clone/",
+                "/basic/js-promise/"
                 ]
             }
       ],
