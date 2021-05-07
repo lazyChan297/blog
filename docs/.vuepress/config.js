@@ -10,6 +10,7 @@ module.exports = {
       lineNumbers: true // 代码块显示行号
     },
     themeConfig: {
+      pathUrl: '',
       // 导航栏配置
       nav:[ ],
       // 侧边栏配置
@@ -24,7 +25,8 @@ module.exports = {
                 "/basic/js-throttle&debounce/",
                 "/basic/js-clone/",
                 "/basic/js-promise/",
-                "/basic/js-flat&unique/"
+                "/basic/js-flat&unique/",
+                "/basic/js-designMode/"
                 ]
             }
       ],
