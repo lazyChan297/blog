@@ -31,9 +31,10 @@ module.exports = {
         },
         {
           title: 'vue源码学习',
-          collapsable: false,
+          collapsable: true,
           children: [
-            "/analysis/vue-lifecycle/"
+            "/analysis/vue-lifecycle/",
+            "/analysis/vue-keepalive/"
           ]
         }
       ],
