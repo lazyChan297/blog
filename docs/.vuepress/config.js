@@ -28,7 +28,14 @@ module.exports = {
                 "/basic/js-flat&unique/",
                 "/basic/js-designMode/"
                 ]
-            }
+        },
+        {
+          title: 'vue源码学习',
+          collapsable: false,
+          children: [
+            "/analysis/vue-lifecycle/"
+          ]
+        }
       ],
       sidebarDepth: 6, // 侧边栏显示2级
     }
