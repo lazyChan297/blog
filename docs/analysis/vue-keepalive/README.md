@@ -1,17 +1,24 @@
 # keep-alive实现缓存原理
 
 ## 实现原理
+
+::: tip 部分属性和函数说明
+**keepAlive**: 渲染节点时通过vnode.data.keepAlive对象来处理该节点的缓存
+**keys**: keepAlive.keys 保存需要缓存的组件的key
+**cache**: 保存缓存节点vnode的对象，键名为key值，键值为vnode
+**pruneCache**: 清空cache指定key的函数
+:::
+
 - 被keep-alive标签包裹的组件接收父组件传递的两个参数值`includes`和`exclude`数组来判断是否对组件缓存处理
-- this.cache对象来记录要缓存的组件
-- keys来记录缓存组件的key
-- keep-alive在调用`mounted`生命周期时，监听includes和exclude变化，遍历cache缓存的组件获取name；
-  * 如果name与includes的值不匹配，删除cache里对应的组件；
-  * 如果name与exclude的值不匹配，删除cache里对应的组件
+
+- keep-alive在调用`mounted`生命周期时，监听includes和exclude变化，每当这两个值变化时根据includes和excludes判断来删除cache[key]
+  -  获取与includes不匹配的值的key，遍历cache，如果cache里存在key，则删除cache[key]
+  -  获取与excludes匹配的值的key 如果name与excludes的值匹配，删除cache[key]；
 * keep-alive的render函数处理，
   * 如果当前的子组件name与include数组不匹配或者与exclude数组匹配则直接返回vnode；
   * 如果是缓存的组件，则返回cache[key]里的对象，并把原本keys里的key删除，重新push，调整缓存组件的序列；
   * 如果keys超出最大缓存数，则把第一个缓存的组件从cache里删除
-* 当组件被destroyd时，清空cache里的所有组件
+* 当组件被destroyed时，清空cache里的所有组件
 
 ## 源码部分
 
@@ -37,8 +44,10 @@ var KeepAlive = {
     var this$1 = this;
 		// 使用watch监听include和exclude 一旦变更，立刻更新缓存
     this.$watch('include', function (val) {
+      // 删除与include不匹配的cache里的key
       pruneCache(this$1, function (name) { return matches(val, name); });
     });
+    // // 删除与exclude匹配的cache里的key
     this.$watch('exclude', function (val) {
       pruneCache(this$1, function (name) { return !matches(val, name); });
     });
@@ -52,26 +61,19 @@ var KeepAlive = {
       var ref = this;
       var include = ref.include;
       var exclude = ref.exclude;
-      if (
-        // not included
-        (include && (!name || !matches(include, name))) ||
-        // excluded
-        (exclude && name && matches(exclude, name))
-      ) {
-        // 子组件没有included的组件或者有不缓存的组件，直接返回vnode
+      // 组件名与exclude匹配or组件名与include不匹配，直接返回vnode
+      if ( (include && (!name || !matches(include, name))) || (exclude && name && matches(exclude, name))) {
         return vnode
       }
     }
     // 如果vnode.key为空，key等于cid::tag 否则key=vnode.key
     var key = vnode.key == null
-        // same constructor may get registered as different local components
-        // so cid alone is not enough (#3269)
         ? componentOptions.Ctor.cid + (componentOptions.tag ? ("::" + (componentOptions.tag)) : '')
         : vnode.key;
     // 如果当前节点存在缓存直接返回缓存的值
     if (this.cache[key]) {
       vnode.componentInstance = cache[key].componentInstance;
-      // make current key freshest
+      // 删除keys里对应的key，重新push，调整key的位置
       remove(keys, key);
       keys.push(key);
     } else {
