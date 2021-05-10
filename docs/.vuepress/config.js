@@ -47,7 +47,8 @@ module.exports = {
             "/analysis/vue-diff/",
             "/analysis/vue-computed/"
           ]
-        }
+        },
+        '/http/http-network/'
       ],
       sidebarDepth: 6, // 侧边栏显示2级
     }
