@@ -3,12 +3,19 @@ module.exports = {
     description: '297 blog',
     head: [ // 注入到当前页面的 HTML <head> 中的标签
       ['link', { rel: 'icon', href: '/logo.jpg' }], // 增加一个自定义的 favicon(网页标签的图标)
+      ['script', { src: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js' }],
+      ['script', { src: 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.2/jquery.fancybox.min.js' }],
+      ['link', { rel: 'stylesheet', type: 'text/css', href: 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.2/jquery.fancybox.min.css' }]
+
     ],
     // 这是部署到github相关的配置
     base: '', 
     markdown: {
       lineNumbers: true // 代码块显示行号
     },
+    plugins: [
+      ['vuepress-plugin-markmap']
+    ],
     themeConfig: {
       pathUrl: '',
       // 导航栏配置
@@ -37,6 +44,7 @@ module.exports = {
             "/analysis/vue-lifecycle/",
             "/analysis/vue-nexttick/",
             "/analysis/vue-keepalive/",
+            "/analysis/vue-diff/",
             "/analysis/vue-computed/"
           ]
         }
