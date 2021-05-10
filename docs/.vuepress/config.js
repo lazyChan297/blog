@@ -35,6 +35,7 @@ module.exports = {
           children: [
             "/analysis/vue-reactive/",
             "/analysis/vue-lifecycle/",
+            "/analysis/vue-nexttick/",
             "/analysis/vue-keepalive/",
             "/analysis/vue-computed/"
           ]
