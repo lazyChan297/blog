@@ -8,6 +8,7 @@ module.exports = {
       ['link', { rel: 'stylesheet', type: 'text/css', href: 'https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.2/jquery.fancybox.min.css' }]
 
     ],
+    port: '8099',
     // 这是部署到github相关的配置
     base: '', 
     markdown: {
@@ -48,7 +49,8 @@ module.exports = {
             "/analysis/vue-computed/"
           ]
         },
-        '/http/http-network/'
+        '/http/http-network/',
+        '/engineering/modules/'
       ],
       sidebarDepth: 6, // 侧边栏显示2级
     }
