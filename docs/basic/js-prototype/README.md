@@ -48,7 +48,7 @@ function Parent(name) {this.name = name}
 function Child(name) { Parent.call(this, name) }
 let babe = new Child('babe')
 ```
-### 原型链继承
+### ES5原型链继承
 将子类的prototype赋值为父类的prototype，缺点是不能继承父类的构造方法
 ```javascript
 function Parent(name) {this.name = name}
@@ -61,7 +61,7 @@ let babe = new Child('babe')
 babe.sayHi()
 ```
 
-### 构造-原型组合继承
+### ES5构造-原型组合寄生继承
 ```javascript
 function Super(name) {
   this.name = name
