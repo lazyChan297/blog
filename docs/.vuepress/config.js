@@ -56,6 +56,7 @@ module.exports = {
           title: 'css',
           collapsable: true,
           children: [
+            "/css/css-basics/",
             "/css/css-layout/"
           ]
         }
