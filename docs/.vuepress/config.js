@@ -51,7 +51,14 @@ module.exports = {
         },
         '/http/http-network/',
         '/engineering/modules/',
-        '/engineering/babel/'
+        '/engineering/babel/',
+        {
+          title: 'css',
+          collapsable: true,
+          children: [
+            "/css/css-layout/"
+          ]
+        }
       ],
       sidebarDepth: 6, // 侧边栏显示2级
     }
