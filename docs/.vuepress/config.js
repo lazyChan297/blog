@@ -50,7 +50,8 @@ module.exports = {
           ]
         },
         '/http/http-network/',
-        '/engineering/modules/'
+        '/engineering/modules/',
+        '/engineering/babel/'
       ],
       sidebarDepth: 6, // 侧边栏显示2级
     }
