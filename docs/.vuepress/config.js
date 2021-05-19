@@ -49,7 +49,14 @@ module.exports = {
             "/analysis/vue-computed/"
           ]
         },
-        '/http/http-network/',
+        {
+          title: '网络',
+          collapsable: true,
+          children: [
+            '/http/http-network/',
+            'http/https/'
+          ]
+        },
         '/engineering/modules/',
         '/engineering/babel/',
         {
