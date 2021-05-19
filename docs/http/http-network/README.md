@@ -56,9 +56,35 @@ encodeURIComponent(url) // http%3A%2F%2Fwww.72lsy.vip%3Fquery%3D%E6%90%BA%E5%B8%
 
 ## 7. 浏览器渲染
 
-1. 根据HTML解析DOM数
+1. 根据HTML文档解析DOM树
 2. 根据CSS生成CSSOM树
 3. 结合DOM和CSSOM，生成render tree
-4. 根据render tree计算每一个节点的大小和位置
-5. 根据计算好的位置和大小绘制节点
+4. 根据render tree进行回流，得到节点的几何信息（位置和大小）
+5. 根据回流得到的几何信息进行重绘
+6. 调用GPU绘制，展示在页面上
+
+### 回流和重绘的触发
+- 回流
+    - 页面第一次渲染
+    - 删除或添加dom元素
+    - 元素位置发生变化
+    - 元素尺寸发生变化（margin，padding，border，width，height）
+    - 元素的内容发生变化
+    - 浏览器窗口发送变化
+    - 获取元素的offsetTop,offsetLeft,offsetWidth,offsetHeight,scrollTop,scrollLeft,scrollRight,scrollWidth,scrollHeight,
+      clientTop,clientLeft,clientWidth,clientHeight;因为这些元素都需要进行实时的计算
+- 重绘
+    - 触发回流就因为会触发重绘
+    - color，文本方向，阴影的修改
+
+- 尽可能减少回流触发的方式
+1. 避免使用table布局
+2. 样式尽量使用class管理，避免直接操作dom元素 例如不要这样：el.style.width = 100px
+3. css文件的层级不要太多，尽量扁平化
+
+## 一些优化方式
+script标签尽量放在body底部，因为浏览器在解析到script标签的时候会暂停构建dom
+如果加载的文件没有任何的依赖，可以在script标签加async="async" 表示异步加载
+给script标签加defer属性，表示加载该文件不会阻塞dom的渲染，在html文档解析完毕，DOMContentLoaded前顺序执行
+
 
