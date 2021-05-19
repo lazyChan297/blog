@@ -30,6 +30,7 @@ module.exports = {
                 "/basic/call&apply&bind/",
                 "/basic/js-prototype/",
                 "/basic/js-curry/",
+                "/basic/js-storage/",
                 "/basic/js-throttle&debounce/",
                 "/basic/js-clone/",
                 "/basic/js-promise/",
