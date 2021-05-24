@@ -12,7 +12,7 @@ module.exports = {
     // 这是部署到github相关的配置
     base: '', 
     markdown: {
-      lineNumbers: true // 代码块显示行号
+      lineNumbers: false // 代码块显示行号
     },
     plugins: [
       ['vuepress-plugin-markmap']
