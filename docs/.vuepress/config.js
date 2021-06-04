@@ -35,7 +35,8 @@ module.exports = {
                 "/basic/js-clone/",
                 "/basic/js-promise/",
                 "/basic/js-flat&unique/",
-                "/basic/js-designMode/"
+                "/basic/js-designMode/",
+                "/basic/js-new/"
                 ]
         },
         {
