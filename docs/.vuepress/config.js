@@ -36,7 +36,8 @@ module.exports = {
                 "/basic/js-promise/",
                 "/basic/js-flat&unique/",
                 "/basic/js-designMode/",
-                "/basic/js-new/"
+                "/basic/js-new/",
+                "/basic/js-implicit/"
                 ]
         },
         {
