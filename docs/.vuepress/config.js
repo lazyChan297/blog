@@ -24,13 +24,6 @@ module.exports = {
       // 侧边栏配置
       sidebar: [
         {
-          title: 'algorithm',
-          collapsable: false,
-          children: [
-            "/algorithm/binaryTree/"
-          ]
-        },
-        {
             title: 'javascript', 
             collapsable: true, 
             children: [
