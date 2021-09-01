@@ -1,5 +1,7 @@
 ## 文章列表
 
+### 数据结构与算法
+1. [二叉树](/algorithm/binaryTree/)
 ### javascript基础
 1. [手写apply,call,bind](/basic/call&apply&bind/)
 

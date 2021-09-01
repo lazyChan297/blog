@@ -24,7 +24,7 @@ module.exports = {
       // 侧边栏配置
       sidebar: [
         {
-          title: 'algorithm',
+          title: '数据结构与算法',
           collapsable: false,
           children: [
             "/algorithm/binaryTree/"
