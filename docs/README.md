@@ -1,7 +1,9 @@
 ## 文章列表
 
-### 数据结构与算法
+### 数据结构
 1. [二叉树](/algorithm/binaryTree/)
+2. [链表](/algorithm/linkedList/)
+
 ### javascript基础
 1. [手写apply,call,bind](/basic/call&apply&bind/)
 

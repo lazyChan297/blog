@@ -27,7 +27,8 @@ module.exports = {
           title: '数据结构与算法',
           collapsable: false,
           children: [
-            "/algorithm/binaryTree/"
+            "/algorithm/binaryTree/",
+            "/algorithm/linkedList/"
           ]
         },
         {
