@@ -32,6 +32,13 @@ module.exports = {
           ]
         },
         {
+          title: 'React',
+          collapsable: false,
+          children: [
+            "/react/redux/"
+          ]
+        },
+        {
             title: 'javascript', 
             collapsable: true, 
             children: [
@@ -45,7 +52,9 @@ module.exports = {
                 "/basic/js-flat&unique/",
                 "/basic/js-designMode/",
                 "/basic/js-new/",
-                "/basic/js-implicit/"
+                "/basic/js-implicit/",
+                "/basic/js-this/",
+                "/basic/es6-set&map&weakSet&weakMap/"
                 ]
         },
         {

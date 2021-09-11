@@ -1,5 +1,7 @@
 ## 文章列表
 
+## React
+1. [react-redux](/react/redux/)
 ### 数据结构
 1. [二叉树](/algorithm/binaryTree/)
 2. [链表](/algorithm/linkedList/)
@@ -26,6 +28,8 @@
 8. [js设计模式-观察者模式](/basic/js-designMode/#观察者模式)
 
 9. [js设计模式-订阅发布者模式](basic/js-designMode/#订阅-发布者模式)
+
+10. [es6-set、map、WeakSet、WeakMap](/basic/es6-set&map&weakSet&weakMap/)
 
 ### vue源码学习
 
