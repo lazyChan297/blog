@@ -79,6 +79,7 @@ module.exports = {
         },
         '/engineering/modules/',
         '/engineering/babel/',
+        '/engineering/webpack/',
         {
           title: 'css',
           collapsable: true,
