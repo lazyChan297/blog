@@ -48,7 +48,6 @@ module.exports = {
                 "/basic/js-storage/",
                 "/basic/js-throttle&debounce/",
                 "/basic/js-clone/",
-                "/basic/js-promise/",
                 "/basic/js-flat&unique/",
                 "/basic/js-designMode/",
                 "/basic/js-new/",
@@ -56,6 +55,15 @@ module.exports = {
                 "/basic/js-this/",
                 "/basic/es6-set&map&weakSet&weakMap/"
                 ]
+        },
+        {
+          title: '异步编程',
+          collapsable: false,
+          children: [
+            "/async/asyncawait/",
+            "/async/js-promise/",
+            "/async/generator/"
+          ]
         },
         {
           title: 'vue源码学习',

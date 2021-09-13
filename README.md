@@ -1,6 +1,6 @@
 ## 文章列表
 
-### javascript基础
+### javascript
 1. [手写apply,call,bind](/basic/call&apply&bind/)
 
 2. [深浅拷贝](/basic/js-clone)
@@ -11,17 +11,19 @@
 
 5. [防抖函数](/basic/js-throttle&debounce/#防抖)
 
-5. [原型链与继承](/basic/js-prototype)
-
-6. [ES6-Promise](/basic/js-promise)
+6. [原型链与继承](/basic/js-prototype)
 
 7. [数组去重的一些方法](/basic/js-flat&unique/#数组去重)
 
 8. [数组扁平的一些方法](/basic/js-flat&unique/#数组扁平flat)
 
-8. [js设计模式-观察者模式](/basic/js-designMode/#观察者模式)
+9. [js设计模式-观察者模式](/basic/js-designMode/#观察者模式)
 
-9. [js设计模式-订阅发布者模式](basic/js-designMode/#订阅-发布者模式)
+10. [js设计模式-订阅发布者模式](basic/js-designMode/#订阅-发布者模式)
+
+### 异步编程
+1. [async](/async/asyncawait/)
+2. [Promise](/async/js-promise/)
 
 ### vue源码学习
 
