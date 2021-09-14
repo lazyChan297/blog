@@ -46,6 +46,13 @@ such as <br/>
 如果有return 就返回return的值<br/>
 否则返回值是undefined
 
+### 遍历执行
+`generator`函数具有`Iterator`接口，所以可以被遍历，遍历的过程也就是任务执行器调用的过程
+such as
+`function* foo(){yield 1;yield 2;}` <br/>
+可以改成
+`for (let g of foo()){}` <br/>
+当返回值的`done`变为`true`之后遍历就会停止
 
 
 
