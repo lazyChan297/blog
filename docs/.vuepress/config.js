@@ -93,7 +93,8 @@ module.exports = {
           collapsable: true,
           children: [
             "/css/css-basics/",
-            "/css/css-layout/"
+            "/css/css-layout/",
+            "/css/css-animation/"
           ]
         }
       ],
