@@ -52,5 +52,108 @@ await方法通常用来执行需要异步处理的函数，await命令后的代�
 因为`forEach`的回调函数会变为普通函数
 
 ### 与generator的区别
+generator函数必须通过任务执行器（可以理解为generator函数的返回值）调用执行，<br/>
+或者遍历generator调用执行<br/>
+async可以自动执行
 
 ### 与Promise的区别
+在代码结构上，`async`会比`promise`函数更加清晰
+
+## async实现原理
+async的generator的语法糖，区别只在于async可以自动执行，<br/>
+不需要像generator一样调用任务执行器，<br/>
+所以只需要实现一个generator的自动执行器，<br/>
+就可以实现`async`
+
+### 自动执行器的实现思路
+1. 返回一个promise对象，因为`async`函数的返回值就是promise对象
+```javascript
+function spawn(genF) {
+    return new Promise((resolve, reject) => {})
+}
+```
+2. 获取`generator`函数的任务运行器，<br/>
+`spawn`的入参`genF`就是`generator`函数
+```javascript
+function spawn(genF) {
+    return new Promise((resolve, reject) => {
+        const gen = genF()
+    }) 
+}
+```
+
+3. 创建一个递归函数`step`，自动调用任务执行器的核心;
+```javascript
+function(nextFn) {
+    // next缓存每次gen.next()的返回值 
+    let next;
+    try {
+        next = nextFn()
+    } catch(e) {
+        // 运行报错，async函数的返回值直接被rejected
+        return reject(e)
+    }
+    // yield已经全部执行完毕,async函数的返回值被resolved
+    if (next.done) {
+        return resolve(next.value)
+    }
+    // 继续执行剩下的yield
+    Promise.resolve(next.value).then(
+        (value) => {
+            // value返回值被resolve
+            gen.next(value)
+        }, err => {
+            gen.throw(e)
+        }
+    )
+}
+```
+4. 运行递归函数`step`，实现自动运行
+```javascript
+    function spawn(genF) {
+        return new Promise((resolve, rejected) => {
+            // ...忽略部分代码
+            function step(nextFn) {}
+            // 因为第一次调用next的参数无效，所以传undefined
+            step(() => gen.next(undefined))
+        })
+    }
+```
+
+5. 完整代码
+```javascript
+async function fn() {}
+
+// 等同于
+function fn() {
+    return spawn(function* () {})
+}
+function spawn(genF) {
+    return new Promise((resolve, reject) => {
+        // 2.1 获取任务执行器
+        const gen = getF()
+        function step(nextF) {
+            let next;
+            try {
+                next = nextF()
+            } catch(e) {
+                return rejected(e)
+            }
+            // 已经全部执行了yield表达式
+            if (next.done) {
+                return resolve(next.value)
+            }
+            Promise.resolve(next.value).then(function(v) {
+                step(function() {
+                    return gen.next(v)
+                })
+            }, function(e) {
+                step(function() {
+                    return gen.throw(v)
+                })
+            })
+        }
+        step(function() {return gen.next(undefined)})
+    })
+}
+```
