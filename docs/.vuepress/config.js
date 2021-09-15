@@ -83,7 +83,8 @@ module.exports = {
           collapsable: true,
           children: [
             '/http/http-network/',
-            'http/https/'
+            '/http/https/',
+            '/http/http-tcp/'
           ]
         },
         '/engineering/modules/',
