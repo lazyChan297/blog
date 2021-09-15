@@ -28,6 +28,8 @@
 
 10. [es6-set、map、WeakSet、WeakMap](/basic/es6-set&map&weakSet&weakMap/)
 
+11. [作用域](/basic/js-scope/)
+
 ### CSS
 1. [布局](/css/css-layout/)
 2. [文档流](/css/css-basics/)

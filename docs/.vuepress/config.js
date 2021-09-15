@@ -53,7 +53,8 @@ module.exports = {
                 "/basic/js-new/",
                 "/basic/js-implicit/",
                 "/basic/js-this/",
-                "/basic/es6-set&map&weakSet&weakMap/"
+                "/basic/es6-set&map&weakSet&weakMap/",
+                "/basic/js-scope/"
                 ]
         },
         {
