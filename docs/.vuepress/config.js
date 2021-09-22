@@ -79,7 +79,8 @@ module.exports = {
             '/networkAngBrowser/http-network/',
             '/networkAngBrowser/https/',
             '/networkAngBrowser/http-tcp/',
-            '/networkAngBrowser/browserCaching/'
+            '/networkAngBrowser/browserCaching/',
+            '/networkAngBrowser/garbageCollection/'
           ]
         },
         {
