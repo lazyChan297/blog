@@ -23,21 +23,7 @@ module.exports = {
       nav:[ ],
       // 侧边栏配置
       sidebar: [
-        {
-          title: '数据结构与算法',
-          collapsable: false,
-          children: [
-            "/algorithm/binaryTree/",
-            "/algorithm/linkedList/"
-          ]
-        },
-        {
-          title: 'React',
-          collapsable: false,
-          children: [
-            "/react/redux/"
-          ]
-        },
+        
         {
             title: 'javascript', 
             collapsable: true, 
@@ -80,17 +66,32 @@ module.exports = {
           ]
         },
         {
-          title: '网络',
-          collapsable: true,
+          title: 'React',
+          collapsable: false,
           children: [
-            '/http/http-network/',
-            '/http/https/',
-            '/http/http-tcp/'
+            "/react/redux/"
           ]
         },
-        '/engineering/modules/',
-        '/engineering/babel/',
-        '/engineering/webpack/',
+        {
+          title: '网络与浏览器',
+          collapsable: true,
+          children: [
+            '/networkAngBrowser/http-network/',
+            '/networkAngBrowser/https/',
+            '/networkAngBrowser/http-tcp/',
+            '/networkAngBrowser/browserCaching/'
+          ]
+        },
+        {
+          title: '工程',
+          children: true,
+          children: [
+            '/engineering/modules/',
+            '/engineering/babel/',
+            '/engineering/webpack/',
+          ]
+        },
+        
         {
           title: 'css',
           collapsable: true,
@@ -98,6 +99,14 @@ module.exports = {
             "/css/css-basics/",
             "/css/css-layout/",
             "/css/css-animation/"
+          ]
+        },
+        {
+          title: '数据结构与算法',
+          collapsable: false,
+          children: [
+            "/algorithm/binaryTree/",
+            "/algorithm/linkedList/"
           ]
         }
       ],
