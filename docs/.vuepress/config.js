@@ -45,7 +45,7 @@ module.exports = {
         },
         {
           title: '异步编程',
-          collapsable: false,
+          collapsable: true,
           children: [
             "/async/asyncawait/",
             "/async/js-promise/",
@@ -67,7 +67,7 @@ module.exports = {
         },
         {
           title: 'React',
-          collapsable: false,
+          collapsable: true,
           children: [
             "/react/redux/"
           ]
@@ -80,7 +80,8 @@ module.exports = {
             '/networkAngBrowser/https/',
             '/networkAngBrowser/http-tcp/',
             '/networkAngBrowser/browserCaching/',
-            '/networkAngBrowser/garbageCollection/'
+            '/networkAngBrowser/garbageCollection/',
+            '/networkAngBrowser/MemoryLeak/'
           ]
         },
         {
@@ -104,7 +105,7 @@ module.exports = {
         },
         {
           title: '数据结构与算法',
-          collapsable: false,
+          collapsable: true,
           children: [
             "/algorithm/binaryTree/",
             "/algorithm/linkedList/"
