@@ -25,9 +25,11 @@ module.exports = {
       sidebar: [
         
         {
-            title: 'javascript', 
+            title: 'JavaScript', 
             collapsable: true, 
             children: [
+                "/basic/js-this/",
+                "/basic/js-new/",
                 "/basic/call&apply&bind/",
                 "/basic/js-prototype/",
                 "/basic/js-curry/",
@@ -36,9 +38,7 @@ module.exports = {
                 "/basic/js-clone/",
                 "/basic/js-flat&unique/",
                 "/basic/js-designMode/",
-                "/basic/js-new/",
                 "/basic/js-implicit/",
-                "/basic/js-this/",
                 "/basic/es6-set&map&weakSet&weakMap/",
                 "/basic/js-scope/"
                 ]

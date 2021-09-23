@@ -1,4 +1,4 @@
-# js中的this
+# this
 
 ## 普通函数中的this
 如果是非严格模式，this指向window

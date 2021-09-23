@@ -1,4 +1,4 @@
-# ES6 - Set、Map、WeakSet、WeakMap
+# Set Map WeakSet WeakMap
 
 ## Set
 ### 创建集合
