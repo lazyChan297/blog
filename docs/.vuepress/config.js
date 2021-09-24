@@ -62,7 +62,8 @@ module.exports = {
             "/analysis/vue-nexttick/",
             "/analysis/vue-keepalive/",
             "/analysis/vue-diff/",
-            "/analysis/vue-computed/"
+            "/analysis/vue-computed/",
+            "/analysis/vue-set/"
           ]
         },
         {
