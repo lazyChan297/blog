@@ -17,14 +17,17 @@ vue中数据的更新是批量异步更新是怎么理解的？<br/>
 :::
 
 
+
+
+## NextTick实现原理
+
 ::: tip 一些变量和函数说明
-- **pending** 布尔值，true表示已经把清空队列的函数注册到微任务队列中，false表示微任务函数已经执行完毕可以重新注册
-- **flushing** 布尔值，true异步更新的队列正在更新
-- **waiting** 布尔值，true表示已经有一轮nextTick任务
-- **callbacks** 数组，负责保存需要注册到微任务队列的函数
+- **pending** 布尔值，表示是否可以批量异步执行的函数注册的异步队列中
+- **callbacks** 数组，负责保存需要注册到异步队列的函数
 - **flushCallbacks** 函数，负责遍历执行callbacks并清空该数组、把pending设为false
-- **next-tick** 负责把需要注册到微任务队列的函数添加到callbacks数组中、控制是否打开注册微任务函数的开关
-- **timerFunc** 将`flushCallbacks`函数注册到微任务队列的具体实现，原理是利用`Promise`or`setImmediate`or`MutationObserver`or`setTimeout`实现异步回调在本次同步代码执行结束后调用callbacks的函数，
+- **next-tick** 负责把需要注册到微任务队列的函数添加到callbacks数组中、把`flushCallbacks`注册异步队列中
+- **timerFunc** 将`flushCallbacks`函数变为微任务注册到异步队列的具体实现，<br/>
+原理是利用`Promise`or`setImmediate`or`MutationObserver`or`setTimeout`实现异步回调在本次同步代码执行结束后调用callbacks的函数，
 这样就可以保证`callbacks`函数异步执行<br/>
 
 以`Promise`为例
@@ -35,18 +38,11 @@ timerFunc = p.then(flushCallbacks)
 ```
 :::
 
-## NextTick实现原理
-`nextTick`接收一个函数参数cb推入callbacks数组；
-每次调用`nextTick`会判断`pending`,如果`pending`为`false`，那么将callbacks注册到异步任务（微任务）队列，<br/>
-**注册函数到异步任务队列**， `timerFunc`开始执行,此时`flushCallBacks`函数已经在异步任务队列中了
-**异步任务开始执行**，根据eventloop，异步任务开始执行,也就是`flushCallBacks`开始执行，遍历清空`callbacks`,<br/>
-**清空前面注册的函数**, `flushCallBacks`执行完毕，`callbacks`数组被清空
-
-
-
-
-## NextTick源码
-
+1. `nextTick`接收一个函数参数cb推入callbacks数组，<br/>
+2. 实现一个`flushCallbacks`函数，它负责遍历callbacks执行、打开可以注册新的微任务到异步队列的开关、清空callbacks数组
+3. 每次把需要注册到微任务队列的函数添加到callbacks时还会检查是否已经把遍历callbacks的函数注册到微任务队列中如果没有则注册，<br>
+同时把`pending`设置为true，不允许同时注册多个批量执行的微任务到队列中
+4. 当微任务`flushCallbacks`开始执行，可以注册新的微任务到异步队列的开关被打开，批量异步执行的数组被清空
 ### nextTick
 ```javascript
 function nextTick(cb, ctx) {
@@ -91,6 +87,8 @@ function flushCallbacks () {
 ```
 
 ## 批量异步更新实现原理
+实现原理就是基于`nextTick`的功能，批量的把观察者实例们都注册到异步队列中。
+
 1. **当响应式对象更新后，通知它的观察者函数更新**<br/>
 如果是异步更新的组件，这一步骤只会把该组件中响应式对象的观察者添加到队列（所有异步更新的观察者的队列队）中排队，<br/>
 并不会真正执行更新的回调
@@ -169,7 +167,7 @@ for (index = 0; index < queue.length; index++) {
 `flushing`设置为`false`, 表示当前没有队列在遍历<br/>
 `has`设置为空，表示当前队列没有观察者实例<br/>
 
-## 手写nextTick
+## 手写nextTick并实现批量异步更新
 ```javascript
 let uid = 0
 class Watcher {
