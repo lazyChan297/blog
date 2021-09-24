@@ -1,16 +1,19 @@
-# 原型与原型链继承
+# 原型、原型链、继承
 
-## 实例的[[prototype]]
-实例作为一个对象，拥有__proto__指针 指向它的构造函数的prototype
+## 原型
+### 实例的[[prototype]]
+每一个对象都有__proto__指针，实例作为一个对象，也拥有__proto__指针，指向它的构造函数的prototype
 ```javascript
 function F() {}
 let f = new F()
 f.__proto__ === F.prototype // true
 ```
 
-## 构造函数prototype
-构造函数自身会拥有prototype指针，注意不是[[prototype]]
-prototype可以理解指向该函数单独的一块空间内存（对象），里面保存了它的构造函数、空间内存自己的_proto_，同时这一块空间内存可以继续添加属性和方法，方便函数和函数的实例通过原型链调用
+### 构造函数prototype
+每一个函数会拥有prototype，构造函数自然也会拥有prototype，注意不是__proto__，<br/>
+prototype可以理解指向该函数的一块空间内存（对象），里面保存了它的构造函数、空间内存（对象）自身的_proto_，<br/>
+同时这一块空间内存可以继续添加属性和方法，方便函数和函数的实例通过原型链调用
+
 ```javascript
 function F() {}
 F.prototype.constructor === F //true
@@ -19,7 +22,7 @@ F.prototype.__proto__ === Object.prototype
 Object.prototype.__proto__ === null // true
 ```
 
-## 原型链的形成
+## 原型链
 
 ```javascript
 function F() {}
@@ -37,16 +40,17 @@ f.a()
 
 所以 `c1.__proto__.__proto__`指向了`P`的原型对象，实现原型链继承
 
-## ES5实现
+## 继承
+### ES5实现继承
 
-### 构造函数继承
+#### 构造函数继承
 本质上是通过call调用父类的构造方法,缺点是不能继承父类的原型方法
 ```javascript
 function Parent(name) {this.name = name}
 function Child(name) { Parent.call(this, name) }
 let babe = new Child('babe')
 ```
-### 原型链继承
+#### 原型链继承
 将子类的prototype赋值为父类的prototype，缺点是不能继承父类的构造方法
 ```javascript
 function Parent(name) {this.name = name}
@@ -59,7 +63,7 @@ let babe = new Child('babe')
 babe.sayHi()
 ```
 
-### ES5构造-原型组合寄生继承
+#### 构造原型组合继承
 ```javascript
 function Super(name) {
   this.name = name
@@ -79,11 +83,11 @@ Sub.prototype = Object.create(Super.prototype)
 // 因为Sub.prototype已经被重写，原来的constructor需要重新赋值
 Sub.prototype.constructor = Sub
 ```
-## ES6实现
+### ES6实现继承
 非常简单，直接使用`extends`关键字，如果想要继承父类的实现构造方案，调用`super`函数。
 需要注意的是，必须在使用`super`后才能使用this指针
 
-### 实现原理
+#### 实现原理
 #### es6代码
 ```javascript
   class Parent {
