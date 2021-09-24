@@ -63,7 +63,8 @@ module.exports = {
             "/analysis/vue-keepalive/",
             "/analysis/vue-diff/",
             "/analysis/vue-computed/",
-            "/analysis/vue-set/"
+            "/analysis/vue-set/",
+            "/analysis/vue2-array-reactive/"
           ]
         },
         {
