@@ -1,19 +1,53 @@
-# nextTick实现原理
-nextTick是用于dom更新循环结束后再执行异步回调
+# NextTick实现原理和批量异步更新策略
 
-## 实现原理
-nextTick接收一个函数参数cb推入callbacks数组；如果当前没有callbacks数组在flush(pending为false)，则调用timerFunc并把pending设为true
-timerFunc用Promise或MutationObserver或setImmediate或setTimeout等方式使flushCallbacks函数注册到微任务队列
- 
-flushCallbacks负责遍历执行全局callbacks并清空该函数数组，并把pending设为false
+::: tip NextTick
+官方的解释是：在下次 DOM 更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的 DOM<br/>
+更通俗的解释：当你修改的数据涉及到dom的更新，想要确保dom已经更新后再进行下一步操作，那么你就在`nextTick`中执行</br>
+本质是通过`Promise`or`setImmediate`or`MutationObserver`or`setTimeout`（具体使用哪一种，看客户端兼容性）<br/>将函数注册到微任务队列中。
+:::
+::: tip 批量异步更新策略
+vue中数据的更新是批量异步更新是怎么理解的？<br/>
+每当响应式对象更新了，它所有的观察者实例都会执行更新的回调，流程如下<br/>
+`1：响应式对象setter` -> `2：观察者实例update` -> `3：观察者实例__update__` -> `4：patch` -> `5：视图更新`
 
-::: tip 一些变量和函数说明
-- callbacks 保存需要异步回调的函数数组的全局对象
-- pending 表示当前是否有nextTick任务在执行的布尔值
-- timerFunc 利用`Promise`or`setImmediate`or`MutationObserver`or`setTimeout`api实现异步回调在本次同步代码执行结束后调用callbacks的函数
+
+第三步会生成新的vnode，第四步会执行diff比较，第五步会更新dom，<br/>
+处于性能提升的考虑，vue会把第二步后面的步骤通过`nextTick`放到一个异步函数的队列中，<br/>
+当执行完前面的同步代码，才会批量更新。
 :::
 
-### 源码部分
+
+::: tip 一些变量和函数说明
+- **pending** 布尔值，true表示已经把清空队列的函数注册到微任务队列中，false表示微任务函数已经执行完毕可以重新注册
+- **flushing** 布尔值，true异步更新的队列正在更新
+- **waiting** 布尔值，true表示已经有一轮nextTick任务
+- **callbacks** 数组，负责保存需要注册到微任务队列的函数
+- **flushCallbacks** 函数，负责遍历执行callbacks并清空该数组、把pending设为false
+- **next-tick** 负责把需要注册到微任务队列的函数添加到callbacks数组中、控制是否打开注册微任务函数的开关
+- **timerFunc** 将`flushCallbacks`函数注册到微任务队列的具体实现，原理是利用`Promise`or`setImmediate`or`MutationObserver`or`setTimeout`实现异步回调在本次同步代码执行结束后调用callbacks的函数，
+这样就可以保证`callbacks`函数异步执行<br/>
+
+以`Promise`为例
+```javascript
+let timerFunc
+const p = Promise.resolve()
+timerFunc = p.then(flushCallbacks)
+```
+:::
+
+## NextTick实现原理
+`nextTick`接收一个函数参数cb推入callbacks数组；
+每次调用`nextTick`会判断`pending`,如果`pending`为`false`，那么将callbacks注册到异步任务（微任务）队列，<br/>
+**注册函数到异步任务队列**， `timerFunc`开始执行,此时`flushCallBacks`函数已经在异步任务队列中了
+**异步任务开始执行**，根据eventloop，异步任务开始执行,也就是`flushCallBacks`开始执行，遍历清空`callbacks`,<br/>
+**清空前面注册的函数**, `flushCallBacks`执行完毕，`callbacks`数组被清空
+
+
+
+
+## NextTick源码
+
+### nextTick
 ```javascript
 function nextTick(cb, ctx) {
     callbacks.push(function () {
@@ -56,10 +90,84 @@ function flushCallbacks () {
 }
 ```
 
-### 小结
-nextTick负责把需要在dom更新结束后延迟调用的函数推出callbacks数组和通过pending判断是否调用timerFunc
-timerFunc负责把callbacks函数注册到微任务队列，当事件循环上的同步代码执行完毕，开始执行微任务
-flushCallback遍历callbacks数组并清空callbacks，把pending设为false，告知下一轮nextTick任务可以开始执行
+## 批量异步更新实现原理
+1. **当响应式对象更新后，通知它的观察者函数更新**<br/>
+如果是异步更新的组件，这一步骤只会把该组件中响应式对象的观察者添加到队列（所有异步更新的观察者的队列队）中排队，<br/>
+并不会真正执行更新的回调
+```javascript
+update () {
+    if (this.lazy) {
+      this.dirty = true
+    } else if (this.sync) {
+      this.run()
+    } else {
+      queueWatcher(this)
+    }
+  }
+```
+
+2. **将观察者添加到异步更新队列**<br/>
+在`queueWatcher`函数中判断，如果已经存在队列中，不做任何操作。如果不存在则添加到队列中
+```javascript
+    const id = watcher.id
+        if (has[id] == null) {
+            has[id] = true
+        }
+    }
+```
+3. **将当前的观察者实例插入正确的顺序中**
+在`queueWatcher`函数中处理，如果此时已经在遍历异步更新的队列，把当前的观察者实例按顺序(根据id)插入到队列中对应的位置，<br/>
+目的是为了让它顺序执行，<br/>
+如果没有在遍历异步更新的队列，让当前观察者实例直接到队列的末端
+```javascript  
+    if (!flushing) {
+      queue.push(watcher)
+    } else {
+      let i = queue.length - 1
+      while (i > index && queue[i].id > watcher.id) {
+        i--
+      }
+      queue.splice(i + 1, 0, watcher)
+    }
+```
+4. **将批量执行异步更新的函数注册到微任务队列中，等待执行<br/>**
+`flushSchedulerQueue`函数负责遍历队列里每一个观察者函数各自的异步更新方法，<br/>
+所以把`flushSchedulerQueue`函数注册到微任务队列中，<br/>
+如果当前没有`nextTick`任务在等待，开启本轮nextTick，对前面的观察者实例执行异步更新回调
+```javascript
+    if (!waiting) {
+      waiting = true
+      nextTick(flushSchedulerQueue)
+    }
+```
+
+5. **遍历执行每一个观察者实例的异步更新方法<br/>**
+对队列的观察者实例们从小到大排序，<br/>
+然后将每一个观察者实例移除队列，因为它们已经执行各自的更新回调，不再需要排队<br/>
+接着执行它们的`run()`方法，也就是触发试图更新的方法
+
+在`flushSchedulerQueue`中处理
+```javascript
+// 排序
+queue.sort((a, b) => a.id - b.id)
+for (index = 0; index < queue.length; index++) {
+    watcher = queue[index]
+    if (watcher.before) {
+      watcher.before()
+    }
+    id = watcher.id
+    // 移除当前观察者
+    has[id] = null
+    // 触发试图更新
+    watcher.run()
+  }
+```
+
+6. **重置状态** <br/>
+把队列清空，
+`waiting`设置为`false`，表示当前没有nextTick任务<br/>
+`flushing`设置为`false`, 表示当前没有队列在遍历<br/>
+`has`设置为空，表示当前队列没有观察者实例<br/>
 
 ## 手写nextTick
 ```javascript
