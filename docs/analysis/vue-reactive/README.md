@@ -1,5 +1,17 @@
-# vue2.x.x响应式原理
+# vue2的响应式原理
 
+::: tip class说明
+Observer（reactive）：响应式对象，该类的实例get和set方法被劫持，get收集依赖，set派发更新<br/>
+Dep：订阅者，负责收集依赖和派发更新 <br/>
+Watcher: 观察者，当收到派发更新的通知后执行相应的回调函数
+:::
+## 实现原理
+1. **实现响应式** 将data里的对象实现响应式，劫持`get`方法作为收集依赖，`set`方法作为派发更新，同时为每一个响应式对象里有一个Dep实例，<br/>
+Dep实例来负责收集依赖和派发更新，同时有一个`Dep.target`全局对象，当前是哪个观察者实例在求值`Dep.target`就指向该观察者实例
+2. **收集依赖** 解析模版时开始创建Watcher实例（观察者），执行watcher实例时会先执行它的`get`方法，此时`Dep.target`执向它自身，<br/>
+当观察者访问响应式对象时，触发了响应式对象的`get`方法，响应式对象的dep实例执行`dep.addSub()`，<br/>
+`addSub`会把当前的`Dep.target`添加到当前响应式对象的`subs`集合中
+3. **派发更新** 前面两步已经收集依赖后，每当响应式对象发生改变，响应式对象的dep实例会遍历它自身的`subs`，派发更新
 ## 实现响应式对象
 首先将data变为响应式，当data发生改变时，依赖data的对象可以自动更新
 ```javascript
@@ -205,97 +217,10 @@ watch(function(){
 hotel.address = '人民中路113号'
 ```
 
-## 小结
-Vue.2.x.x的响应式原理是基于`Object.defineProperty`api结合观察者模式实现的；
-`Object.defineProperty`劫持get和set方法将对象对象响应式；
-为响应式对象创建一个订阅者Dep，Dep可以添加观察者和通知观察者；
-当访问对象（触发get）时Dep为data收集依赖添加观察者；触发set方法时派发更新通知观察者对象已更新
-观察者被添加后可以观察data，当data更新后可以自动响应执行update
+## 总结
+Vue2的响应式原理是基于`Object.defineProperty`api结合观察者模式实现的<br/>
+`Object.defineProperty`劫持get和set方法将对象对象响应式<br/>
+为响应式对象创建一个订阅者Dep，Dep可以添加观察者和通知观察者<br/>
+当访问对象（触发get）时Dep为data收集依赖添加观察者；触发set方法时派发更新通知观察者对象已更新<br/>
+观察者被添加后可以观察data，当data更新后可以自动响应执行update<br/>
 
-## vue2.x.x 监听数组的变化
-由于`Object.defineProperty`api的限制，无法监听数组的变化，但是可以通过劫持部分数组的原型方法实现响应
-
-1. 劫持了对数组本身发生变化的7个方法`splice` `push` `pop` `unshift` `shift` `sort` `reverse`
-2. 通过`Object.defineProperty` 重写以上方法的value，通过`mutator`方法返回；
-3. `mutator`方法执行的过程中会派发更新，如果有新元素增加则将新增的元素observe(变为响应式对象，实现监听)
-
-```javascript
-// vue 源码部分
-// 缓存array所有的原型方法
-var arrayProto = Array.prototype;
-// 继承array所有的原型方法并隔绝
-var arrayMethods = Object.create(arrayProto)
-// 会改变数组本身的方法
-var methodsToPatch = ['push','pop','shift','unshift','splice','sort','reverse']
-methodsToPatch.forEach(function(method) {
-// Array.prototype原型方法
-var origin = arrayProto[method]
-  // def调用Object.definePrototy 将value 重写成了mutator方法，调用以上七个方法时触发mutator
-  def(arrayMethods, method, function mutator() {
-    var args = [], len = arguments.length
-    while(len-- ) arg[len] = arguments[len]
-    // result作为新数组返回
-    var result = origin.apply(this, args)
-    var ob = this.__ob__;
-    // 是否有新增元素
-    var inserted;
-    switch(method) {
-      case 'push':
-      case 'unshift':
-        inserted = args // 新增的元素
-        break;
-      case 'splice':
-        inserted = args.slice(2) // splice存在新增&删除的可能,所以取第二个元素
-        break;
-    }
-    if (inserted) ob.observeArray(inserted)
-    ob.dep.notify() // 派发更新
-    return result
-  })
-})
-```
-
-## Vue.$set实现原理
-由于`Object.defineProperty`api的限制，对象新增的属性也无法监听，但是可以通过vue.$set()为新增的属性实现响应式
-
-::: tip
-target: 新增属性的目标对象
-key: 新增属性的key名
-value: 新增属性的值
-:::
-
-* 如果target是数组且key为合法长度，则通过劫持数组变化的splice对数组进行修改，并实现响应式并返回value
-* 如果添加的key原本就存在target中，则更新target[key]的值并返回value
-* 获取target.的__ob__属性，如果ob不存在则target不是响应式对象，为target[key]赋值value并返回
-* target是响应式对象，调用defineReactive(ob.value, key, value)，为新增的key实现响应式并派发更新，最后返回value
-
-### 实现源码
-```javascript
-export function $set(target, key, value) {
-  // isValidArrayIndex负责判断key是否大于array长度导致赋值错误
-  if (Array.isArray(target && isValidArrayIndex(key))) {
-    // 重新修改数组长度
-    target.length = Math.max(target.length, key)
-    // 通过splice劫持触发响应式
-    target.splice(key, 1, value)
-    return value
-  }
-  // 如果key原本就存在target上直接赋值并返回value
-  if (key in target && !(key in Object.prototype)) {
-    target[key] = value
-    return value
-  }
-  // 获取target的observe
-  const ob = target.__ob__
-  // target不是响应式
-  if (!ob) {
-    target[key] = value
-    return value
-  }
-  // 增加key的响应式处理
-  defineReactive(ob.value, key, value)
-  // 派发更新
-  ob.dep.notify()
-  return value
-}
-```
