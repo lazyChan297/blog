@@ -66,7 +66,7 @@ function MyPromise(fn) {
 }
 ```
 
-### 实现then方法
+### 实现then
 满足以下需求
 1. 满足then()返回值是一个promise对象
 2. 如果then方法传入的函数参数返回值是具备then方法的对象，返回的promise对象由then的执行结果决定；如果传入的函数参数没有返回值或者不是具备then方法的对象那么返回的promise对象状态为fulfilled
@@ -146,7 +146,7 @@ function resolvePromise(promise2, x, resolve, reject) {
 }
 ```
 
-### 实现catch方法
+### 实现catch
 catch()本质就是then方法里的onRejected回调
 ```javascript
 // catch方法
@@ -155,7 +155,7 @@ MyPromise.prototype.catch = function(onRejected) {
 }
 ```
 
-### 实现resolve方法
+### 实现resolve
 返回值是fulfilled状态的promise对象
 ```javascript
 MyPromise.resolve = function(value) {
@@ -165,7 +165,7 @@ MyPromise.resolve = function(value) {
 }
 ```
 
-### 实现reject方法
+### 实现reject
 返回值是rejected状态的promise对象
 ```javascript
 MyPromise.reject = function(reason) {
@@ -175,7 +175,7 @@ MyPromise.reject = function(reason) {
 }
 ```
 
-### 实现race方法
+### 实现race
 接收promises对象数组，返回promises对象；只要有一个promise被resolved,返回值的状态就是fulfilled；resolve传入的参数是被resolved的promise对象的结果
 ```javascript
 MyPromise.race = function(promises) {
@@ -192,7 +192,7 @@ MyPromise.race = function(promises) {
 }
 ```
 
-### 实现all方法
+### 实现all
 接收promises对象数组；如果所有的promise对象被resolved，resolve的参数是所有promise对象的结果数组，promise对象的状态是fulfilled；
 ```javascript
 MyPromise.all = function(promises) {
@@ -207,6 +207,42 @@ MyPromise.all = function(promises) {
                 resolve(results)
             }
         }
+    })
+}
+```
+
+### allSettled
+- 入参 接受一个数组
+- 返回值 `Promise`对象，value是一个数组
+- 实现原理 `Promise.all`的进一步拓展，不管数组里的`Promise`是成功还是失败，都会返回<br/>
+    在每一个then回调方法里判断是否是最后一个promise，如果是则返回
+```javascript
+MyPromise.prototype.allSettled = function(promises) {
+    // 边界条件判断1, 如果数组为空
+    if (promises.length === 0) return Promise.resolve([])
+    // 边界条件判断2，如果数组里包含不是promise的对象
+    let _promises = promises.map((item) => item instanceof Promise ? item : Promise.resolve(item))
+    // 边界条件判断3，是否所有的promise都已经执行了then
+    let unSettled = _promises.length
+    // 满足返回值条件，必须是一个promise对象且value是promises的返回值数组
+    return new Promise((resolve, rejected) => {
+        _promises.forEach((promise, index) => {
+            promise.then(((value) => {
+                results[index] = {
+                    value,
+                    status: 'fulfilled'
+                }
+                unSettled = unSettled - 1
+                if (unSettled === 0) resolve(results)
+            }, reason => {
+                results[index] = {
+                    reason,
+                    status: 'rejected'
+                }
+                unSettled = unSettled - 1
+                if (unSettled === 0) resolve(results)
+            }))
+        })
     })
 }
 ```
