@@ -192,21 +192,32 @@ MyPromise.race = function(promises) {
 }
 ```
 
-### 实现all
+### all
+- 入参：数组，如果数组包含不是promise的对象，要将它转换为promise对象
+- 返回值： `Promise`对象，value是全部元素的`resolve`的返回值
 接收promises对象数组；如果所有的promise对象被resolved，resolve的参数是所有promise对象的结果数组，promise对象的状态是fulfilled；
 ```javascript
 MyPromise.all = function(promises) {
-    return new MyPromise((resolve, reject) => {
-        // 保存promises的resolve结果
-        let results = []
-        for (let i = 0; i < promises.length; i++) {
-            promises[i].then(res => {
-                results.push(res)
-            }, err => reject(err))
-            if (i === promises.length - 1) {
+    // 边界条件判断1, 如果数组为空
+    if (!promises.length) return Promise.resolve([])
+    // 边界条件判断2，如果数组里包含不是promise的对象
+    let _promises = promises.map(item => {
+        return item instanceof Promise ? item : Promise.resolve(item)
+    })
+    let results = []
+    // 满足返回值条件，必须是一个promise对象且value是promises的返回值数组
+    return new Promise((resolve, reject) => {
+        _promises.forEach((promise, index) => {
+            promise.then((value) => {
+                results.push(value)
+                // 边界条件判断3，所有的promise都已经被resolved
+                if (index === promises.length -1) {
                 resolve(results)
-            }
-        }
+                }
+            }, reason => {
+                reject(reason)
+            })
+        })
     })
 }
 ```
