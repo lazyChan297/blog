@@ -53,6 +53,13 @@ module.exports = {
           ]
         },
         {
+          title: '设计模式',
+          collapsable: true,
+          children: [
+            "/DesignPatterns/EventEmitter/"
+          ]
+        },
+        {
           title: 'vue源码学习',
           collapsable: true,
           children: [
