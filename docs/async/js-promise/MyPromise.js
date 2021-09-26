@@ -236,3 +236,30 @@ MyPromise.prototype.finally = function(callback) {
         }
     )
 }
+
+MyPromise.prototype.any = function(promises) {
+    // 边界条件判断1, 如果数组为空
+    if (!promises.length) return Promise.resolve([])
+    // 边界条件判断2，如果数组里包含不是promise的对象
+
+    let _promises = promises.map(item => item instanceof Promise ? item : Promise.resolve(item))
+    // 返回值判断，累计rejected次数决定返回值状态
+    let rejetedTimes = 0
+    // 保存每一个rejected的信息
+    let errors = []
+    // 满足返回值条件，必须是一个promise对象
+    return new Promise((resolve, reject) => {
+        _promises.forEach((promise, index) => {
+        promise.then(value => {
+                resolve(value)
+            }, reason => {
+                rejetedTimes += 1
+                errors[index] = reason
+                if(rejetedTimes === _promises.length) {
+                reject(new AggregateError(
+                    'No Promise in Promise.any was resolved', errors
+                ))}
+            })
+        })
+    })
+}
