@@ -82,6 +82,13 @@ module.exports = {
           ]
         },
         {
+          title: 'node',
+          collapsable: true,
+          children: [
+            "/node/version/"
+          ]
+        },
+        {
           title: '网络与浏览器',
           collapsable: true,
           children: [
