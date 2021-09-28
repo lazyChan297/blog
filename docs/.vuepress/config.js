@@ -63,8 +63,8 @@ module.exports = {
           title: 'vue源码学习',
           collapsable: true,
           children: [
+            "/analysis/vue2-reactive/",
             "/analysis/vue3-reactive/",
-            "/analysis/vue-reactive/",
             "/analysis/vue-lifecycle/",
             "/analysis/vue-nexttick/",
             "/analysis/vue-keepalive/",
