@@ -161,14 +161,14 @@ update () {
 首先调用`observe`函数，把data变为可观察对象，让它实现响应式<br/>
 该函数会把data作为参数传入，调用`Observer`构造方法，为data添加__ob__属性，属性值就是构造函数返回的实例对象。<br/>
 __ob__的`dep`属性是`Dep`函数的实例，同时，`dep`有一个`subs`属性和`addSub`方法和`notify`方法，<br/>
-`subs`是响应式对象观察者函数的集合，<br/>
-- `addSub`方法负责把观察者对象添加到`subs`中。<br/>
-- `dep`属性的`addSub`方法负责执行依赖收集，把观察者对象添加到`subs`中，<br/>
-- `notify`方法负责遍历`subs`数组实现派发更新。<br/>
-接着获取`data`所有的key，通过`Object.defineProperty`方法修改`get`和`set`方法，
+- `subs`是响应式对象观察者函数的集合
+- `addSub`方法负责把观察者对象添加到`subs`中
+- `notify`方法负责遍历`subs`调用每一个观察者对象的`update`方法
+
+接着获取`data`所有的key，修改每一个`key`的`get`和`set`方法<br/>
 如果`data`的`key`值仍然是一个对象，则会递归调用`observe`，重复刚刚的操作。<br/>
 **为了防止出现循环引用，`observe`会判断当前的对象是否已经有了`__ob__`属性，如果有直接返回该属性值。**<br/>
-然后，在`Object.defineProperty`的`get`操作中添加`dep.addSub()`方法，把观察者添加到`subs`属性中，实现收集依赖，<br/>
+然后，通过`Object.defineProperty`，在`get`操作中添加`dep.addSub()`方法，把观察者添加到`subs`属性中，实现收集依赖，<br/>
 在`set`操作中调用`dep.notify()`，遍历`subs`属性，实现派发更新。
 
 如果data是数组，则遍历数组，对每一个元素调用`observe`函数，也就是单独对每一个元素进行响应式操作。<br/>
