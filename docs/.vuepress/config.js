@@ -79,7 +79,8 @@ module.exports = {
           collapsable: true,
           children: [
             "/react/redux/",
-            "/react/rn-mfe/"
+            "/react/rn-mfe/",
+            "/react/rn-communication/"
           ]
         },
         {
