@@ -78,7 +78,8 @@ module.exports = {
           title: 'React',
           collapsable: true,
           children: [
-            "/react/redux/"
+            "/react/redux/",
+            "/react/rn-mfe/"
           ]
         },
         {
