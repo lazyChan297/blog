@@ -56,7 +56,13 @@
 
 ###### react(学习中)
 - [react-redux](/react/redux/)
-- [rn微前端浅谈](/react/rn-mfe/)
+
+###### react-native(学习中)
+- [微前端架构浅谈](/react-native/rn-mfe/)
+- [原生与js的通信](/react-native/rn-communication/)
+- [避免掉帧的解决方案](/react-native/rn-frameDrop/)
+- [预加载](/react-native/rn-preload/)
+
 ##### 工程化
 - [webpack](/engineering/webpack)
 
