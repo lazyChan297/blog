@@ -80,7 +80,8 @@ module.exports = {
           children: [
             "/react/redux/",
             "/react/rn-mfe/",
-            "/react/rn-communication/"
+            "/react/rn-communication/",
+            "/react/rn-frameDrop/"
           ]
         },
         {
