@@ -2,11 +2,14 @@
 
 ## 浅拷贝
 拷贝的是引用类型的内存地址的指针，拷贝的值与被拷贝的值指向的是同一堆内存，两个值之间会互相影响
+
 **实现方式**
-对象的浅拷贝
+
+对象
   - `Object.assign()`
   - `{...object}`
-数组的浅拷贝
+
+数组
 - `slice()`
 - `concat()`
 
@@ -24,10 +27,8 @@ function shallowClone(obj) {
 ## 深拷贝
 拷贝的是值本身，拷贝的对象和被拷贝对象指向的不是同一堆内存，两个值之间互相独立但是值却完全相等
 
-**实现方式**
 ### `JSON.parse(JSON.stringify(obj))`
-如果已知数据结构没有`undefined`、`循环引用`、`Symbol类型`、`function`则可以使用`JSON.parse(JSON.stringify(obj))`
-这种方式非常简单便捷，但是缺点也就是不能实现以上的类型拷贝
+如果已知数据结构没有`undefined`、`循环引用`、`Symbol类型`、`function`则可以使用这种方式，非常简单便捷，但是缺点也就是不能实现以上的类型拷贝
 
 ### DeepClone
 实现一个深拷贝函数，满足以下条件
