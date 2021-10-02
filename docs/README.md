@@ -4,7 +4,7 @@
 :::
 
 ##### 浏览器与网络
-- [从输入URL到页面展示过程](/networkAngBrowser/http-network/)
+- [浏览器渲染原理](/networkAngBrowser/http-network/)
 - [https加密原理](/networkAngBrowser/https/)
 - [TCP详解](/networkAngBrowser/http-tcp/)
 - [浏览器缓存机制](/networkAngBrowser/browserCaching/)
