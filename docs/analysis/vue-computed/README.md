@@ -1,4 +1,9 @@
-# 计算属性源码解读
+# computed实现原理
+
+computed本质上是也是观察者实例Watcher对象，它被它的回调函数收集为依赖
+同时也收集其它的观察者实例作为它自身的依赖。
+
+
 
 假设有计算属性sum,它依赖响应式对象a
 ```javascript
@@ -14,13 +19,12 @@ export default {
 }
 ```
 
-## 初始化流程
-### 1. 执行initComputed
-源码位置 /src/instance/state.js
+## computed初始化
 
-对组件的computed对象进行初始化，做了以下操作
-- 1.1 将计算属性初始化为watcher实例；因为计算属性依赖别的响应式对象，同时也被其他watcher（例如渲染模版）所依赖，所以将计算属性watcher实例化
-- 1.2 执行defineComputed，执行劫持计算属性的get和set方法；劫持了计算属性的get方法，便于收集计算属性的依赖和触发它所依赖的响应式对象求值方法
+### initComputed
+- 将计算属性初始化为watcher实例；因为计算属性依赖别的响应式对象，同时也被其他watcher（例如渲染模版）所依赖，所以将计算属性watcher实例化
+- 劫持`computed`的get和set方法（`defineComputed`函数）；get方法，便于收集计算属性的依赖和触发它所依赖的响应式对象求值方法
+源码如下
 ```javascript
     function initComputed(vm, computed) {
         const watchers = vm._computedWatchers = Object.create(null)
@@ -42,6 +46,18 @@ export default {
             }
         }
     }
+```
+computed初始化后的结构
+- `value: undefined` Watcher构造函数中如果lazy为true，初始化时是不会执行求值函数的，所以value为undefined
+- `dirty: true` 脏数据标识，决定缓存的关键
+- `lazy: true`
+- `deps: []`,
+- `getter: function() {} ` computed的回调函数例如sum() {this.a + 1} 
+### defineComputed
+劫持computed的get方法，劫持后每次触发get
+- 如果dirty为true，表示为脏数据，执行`watcher.evaluate`
+- 如果`Dep.target`存在，将当前的`Dep.target`也就是观察者实例收集到依赖中
+```javascript
     const sharedPropertyDefinition = {
         enumerable: true,
         configurable: true,
@@ -68,139 +84,53 @@ export default {
         }
     }
 ```
-计算属性`new Watcher()`后结构如下
-```javascript
-{
-    value: undefined, // Watcher构造函数中如果lazy为true，初始化时是不会执行求值函数的，所以value为undefined
-    dirty: true, // 决定缓存的值
-    lazy: true,
-    deps: [], 
-    getter: function() {} // getter函数就是vue组件中的 sum() {this.a + 1} 
-}
-```
 
+**通过以上初始化流程可以知道，每次computed属性被访问时，get函数会根据dirty判断是否求值，根据当前是否存在观察者实例判断是否收集依赖**
 
-### 2. 当计算属性被访问
-1. 因为劫持了它的get属性，所以访问该计算属性时会触发计算属性的依赖收集；如果dirty为true，会执行计算属性watcher.evaluate()对计算属性重新求值，否则返回原本的值（缓存）
-### 3. 当计算属性求值
-1. 执行watcher.evaluate()调用watcher.get()，该方法会把Dep.target设为计算属性的watcher，当访问到
-计算属性所依赖的响应式对象（a）时，触发响应式对象（a)的依赖收集，dep.depend()，该方法把响应式对象a添加到计算属性watcher的deps数组中，同时把Dep.target(当前的watcher)添加到dep.subs数组中
-2. 计算属性watcher求值完毕返回value，并把Dep.target重新执向访问该计算属性的watcher，如果Dep.target不为空，执行watcher.depend()，watcher.depend()会遍历它的deps执行depend()，也就是上一步的dep.depend()；所以把依赖计算属性的watcher也添加到了计算属性依赖的响应式对象的subs中
-
-### 4. 初始化示例
-假如有渲染模版watcher访问计算属性sum
-``` html
-<div>{{sum}}</div>
-```
-1. 访问sum时，触发了计算属性sum的get劫持，因为初始化时dirty为false，所以执行get劫持方法的第一步，watcher.evaluate()
-当前的Dep.target为渲染模板watcher
+### computed被收集与收集依赖
+#### computed的收集依赖
+当渲染模版上的观察者函数访问computed属性时，computed的get方法被触发，<br/>
+按照逻辑，computed先进行求值，求值的逻辑和普通的观察者实例watcher一样，会先把`Dep.target`指向自己，<br/>
+接着执行求值函数`get`，<br/>
+computed所依赖的响应式对象被访问，get触发，<br/>
+响应式对象的`dep`执行`depend`，也就是`Dep.target.addDep`
 ```javascript
-// 源码：/src/observer/watcher.js
-if (watcher.dirty) {
-    watcher.evaluate()
-}
-class Watcher{
-    evaluate () {
-        // 触发计算属性的求值函数
-        this.value = this.get();
-        // 求值后把dirty重新设为false
-        this.dirty = false;
-    } 
-}
-```
-2. 计算属性sum开始求值，执行watcher.get()方法
-```javascript
-// 源码：/src/observer/watcher.js
-class Watcher {
-    get () {
-        // 把当前Dep.target执向计算属性watcher
-        pushTarget(this)
-        let value
-        const vm = this.vm
-        // 触发了 sum() {return a + 1}
-        value = this.getter.call(vm, vm)
-        // 把Dep.target重新执行渲染模板watcher
-        popTarget()
-        return value
-    }
-}
-```
-3. 计算属性sum求值过程中，访问了响应式对象a，触发a的get劫持
-```javascript
-// 源码位置 /src/observer/index.js 
-get: function reactiveGetter () {
-    const value = getter ? getter.call(obj) : val
+depend () {
     if (Dep.target) {
-        // 收集依赖
-        dep.depend()
-    }
-    return value
-}
-// 源码位置 /src/observer/dep.js
-class Dep {
-    depend() {
-        // 因为当前Dep.target是计算属性watcher，所以等同于 计算属性watcher.addDep(this)
-        if (Dep.target) {
-            Dep.target.addDep(this)
-        }
+      Dep.target.addDep(this)
     }
 }
-// 源码位置 /src/observer/watcher.js
-class Watcher {
-    addDep(dep) {
-        // 此处做了去重优化
-        if (!this.newDepIds.has(id)) {
-            this.newDepIds.add(id)
-            this.newDeps.push(dep) // 把响应式对象a的dep添加到计算属性watcher.deps中
-            if (!this.depIds.has(id)) {
-                // 把计算属性watcher添加到响应式对象a的subs中
-                dep.addSub(this)
-            }
+```
+观察者实例watcher的addDep会把参数里的dep添加到`watcher.deps`中，同时把自身添加到dep的subs中，<br/>
+这样，**响应式对象的dep的subs中包含了computed属性，computed属性的deps中包含了响应式对象的dep**
+```JavaScript
+addDep(dep) {
+    // 此处做了去重优化
+    if (!this.newDepIds.has(id)) {
+        this.newDepIds.add(id)
+        this.newDeps.push(dep) // 把响应式对象a的dep添加到计算属性watcher.deps中
+        if (!this.depIds.has(id)) {
+            // 把计算属性watcher添加到响应式对象a的subs中
+            dep.addSub(this)
         }
     }
 }
 ```
+求值结束后把`Dep.target`归还给上一个观察者实例，也就是访问computed的观察者实例watcher对象
 
-4. 计算属性求值完毕，执行get劫持的第二步，计算属性收集依赖
-`watcher.get()`执行求值完毕后，会调用`popTarget()`，把`Dep.target`重新指向渲染模版watcher；
-```javascript
-if (Dep.target) {
-    // 遍历watcher的deps，执行dep.depend()，也就是第三步，
-    // 需要注意的是此时的Dep.target是渲染模版watcher
-    watcher.depend()
-}
-// 源码位置 /src/observer/watcher.js
-class Watcher {
-    depend() {
-        let i = this.deps.length
-        while (i--) {
-            this.deps[i].depend()
-        }
-    }
-}
-```
-执行完毕后所以得到，响应式对象a的subs包含计算属性watcher，渲染模版watcher
+#### computed收集依赖它的观察者实例
+computed收集依赖的方式是watcher的`depend`实例方法，该方法会遍历它的deps数组，然后逐个执行`depend`方法，<br/>
+根据上一步的求值已经把响应式对象的dep添加到dep中，dep再执行一遍响应式对象的依赖收集，<br/>
+所以把`Dep.target（也就是当前的渲染模版观察者实例）`添加到它的`subs`中。
 
+自此，初始化流程执行完毕，computed和它依赖的响应式对象，和访问computed的渲染模版观察者实例对象之间的数据结构如下
+- 响应式对象的dep的subs： `[computed, computed的渲染模版观察者实例]`
+- computed的deps： `[应式对象的dep]`
 
-## 更新流程
-当`a`修改时，`dep.notify()`遍历它的subs对象，通知sum计算属性watcher和渲染watcher执行update方法
-```javascript
-// /src/observer/watcher.js
-class Watcher {
-    update() {
-        if (this.lazy) {
-            this.dirty = true // 计算属性watcher命中逻辑，标记为脏数据
-        } else if (this.sync) {
-            this.run() // 渲染模版watcher命中逻辑
-        } else {
-            queueWatcher(this)
-        }
-    }
-}
-```
-渲染模版watcher执行`run()`，`run()`方法触发`get()`，`get()`方法触发了`getter()`，也就是sum的求值函数，此时计算属性watcher的dirty已经被标记为true，所以访问计算属性watcher时会重新求值，求值后再把dirty标记标记为false；
-## 缓存的原理
-作为计算属性被实例化的watcher，dirty的初始值为true，表示该属性为脏数据；
-当访问计算属性时，如果是脏数据才会执行求值方法，否则会直接返回`value`；
-当计算属性的deps修改时，会触发watcher.update()，update方法就会把dirty标记为true
-当依赖计算属性的watcher访问时，dirty为true就会重新求值获得新的计算属性并把dirty修改为false，所以当计算属性的deps没有被修改时，依赖计算属性的watcher求值一次后把dirty标记为true，则不会再进行求值，从而实现缓存，直到deps再次修改；
+## computed更新
+当响应式对象更新时，遍历它`dep`的`subs`，所以依赖它的computed，和依赖computed的观察者实例都会接连更新
+
+## 实现缓存（惰性求值）的原理
+computed不是每次访问都会去计算的，而是根据`dirty`值来判断是否重新求值。
+当computed依赖的响应式属性更新后，computed和依赖computed的观察者实例watcher必然也会更新，`watcher.update`方法会执行`this.dirty = true`
+当响应式属性更新后，观察者实例watcher再次访问computed，此时`dirty`为`true`，那么会执行`evaluate()`重新求值，接着把`dirty`改为false，实现缓存
