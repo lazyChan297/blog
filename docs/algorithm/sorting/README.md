@@ -53,3 +53,31 @@ function divide(arr, startIndex, length) {
 
 可以通过以下链接测试函数
 [quickSort](https://bigfrontend.dev/zh/problem/implement-Quick-Sort)
+
+## 冒泡排序
+遍历数组对所有的元素和它相邻的元素比较，例如
+`[4,2,5,-1]` `4`和`2`比较， `4`比2大，则交换得到 `[2,4,5,-1]`
+接着4和5比较，不需要交换
+5和-1比较，5比-1大，则交换得到 [2,4,-1,5]
+第一轮遍历结束后可以把最大的元素放到最右边，按照这个逻辑
+第二次遍历结束可以把第二大的元素放到最右2，
+第n次遍历得到第n大的元素放到右n的位置，
+而且经过前面的遍历可以对每次遍历的长度减一
+
+那么对长度的数组遍历n*n次就可以实现冒泡排序
+```javascript
+function bubbleSort(arr) {
+  for(let i =0; i<arr.length;i++) {
+    for (let j =0;j<arr.length-i;j++) {
+      if (arr[j] > arr[j + 1]) {
+        const swap = arr[j]
+        arr[j] = arr[j+1]
+        arr[j+1] = swap
+      }
+    }
+  }
+  return arr
+}
+```
+可以通过这个链接测试函数
+[bubbleSort](https://bigfrontend.dev/zh/problem/implement-Bubble-Sort)
