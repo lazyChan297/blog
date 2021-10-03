@@ -107,7 +107,8 @@ module.exports = {
             '/networkAngBrowser/http-tcp/',
             '/networkAngBrowser/browserCaching/',
             '/networkAngBrowser/garbageCollection/',
-            '/networkAngBrowser/MemoryLeak/'
+            '/networkAngBrowser/MemoryLeak/',
+            '/networkAngBrowser/safety/',
           ]
         },
         {
