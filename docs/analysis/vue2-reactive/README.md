@@ -1,17 +1,12 @@
 # vue2的响应式原理
-
+v2的响应式系统是通过劫持数据，将数据变为响应式（可观察）对象，结合观察者模式实现的
 ## 实现响应式对象
 ### observe
 **先把对象变为可观察的**<br/>
-在组件初始化时，执行`initState`or`initData`or`initProps`时调用该函数，实现响应式。<br/>
-实现可观察的对象会携带__ob__属性，属性值是一个被`Object.defineProperty`处理过的对象
-:::tip 入参和返回值说明
-- 参数1 value: 需要实现响应式的对象
-- 参数2 asRootData: 是否为根对象
-- 返回值: 一个被`Object.defineProperty`处理过的对象
-:::
-
-源码分析， 
+在组件初始化时，执行`initState`、`initData`、`initProps`时调用`observe`函数，把对象变为响应式对象，满足可观察的需求<br/>
+该函数通过`Object.defineProperty`劫持对象的`get`和`set`方法并生成一个响应式对象`ob`挂载到对象的私有属性`__ob__`上。<br/>
+如果对象的属性值仍然是对象则递归调用`observe`，为了防止循环引用会在劫持前先判断该对象是否拥有`__ob__`属性。<br/>
+把函数变为响应式对象，源码分析
 ```javascript
 function observe (value, asRootData) {
     // 类型判断
@@ -20,7 +15,7 @@ function observe (value, asRootData) {
     }
     // 定义一个响应式对象作为返回值并会挂载到对象的__ob__属性中，后续用该属性判断是否已经是响应式对象
     var ob;
-    // 个人理解，这一步是为了防止递归data的属性时出现循环引用，如果属性值已经存在__ob__则不再对它进行响应式操作
+    // 这一步是为了防止递归data的属性时出现循环引用，如果属性值已经存在__ob__则不再对它进行响应式操作
     if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
       ob = value.__ob__;
     } else if (
@@ -38,8 +33,10 @@ function observe (value, asRootData) {
     return ob
 }
 ```
-### Observer
-该构造函数负责返回一个可观察的对象实例，通过`def`方法挂载到原对象的`__ob__`属性上
+### new Observer
+`Observer`构造函数负责返回一个可观察的对象实例，通过`def`方法挂载到原对象的`__ob__`属性上，<br/>
+如果对象是数组，则遍历数组然后逐个把元素变为可观察对象，并把v2实现数据变化监听的方法添加到数组的原型上<br/>
+否则获取对象所有的`key`，通过`defineReactive`函数，劫持他们的`get`和`set`属性。<br/>
 源码分析，
 ```javascript
 class Observer {
@@ -83,73 +80,121 @@ class Observer {
 个人理解，通过时候有`__ob__`这一属性值判断，如果属性值已经存在__ob__则不再对它进行响应式操作
 **2.对对象和数组实现响应式操作有什么区别？**
 - 对对象执行`defineReactive`方法，也就是劫持`get`&`set`
-- 对数组遍历，为每一个元素再一次进行观察`observe`
+- 对数组遍历，为每一个元素再一次进行观察`observe`，并且把劫持数据变化的`arrayMethods`方法添加到响应式数组的原型对象上
 
-## 收集依赖
 ### Dep
-订阅者构造函数，该函数的实例`dep`，负责收集依赖，对依赖派发更新。<br/>
-该构造函数的`Target`属性负责指向当前的观察者watcher，<br/>
-当劫持响应式对象，生成它的`Observer`（__ob__）实例时，会包含一个`dep`实例属性。
-当访问了响应式对象会触发`get`劫持，`dep`则把当前的观察者添加到subs实例中（属性负责收集观察者）<br/>
-当修改了响应式对象会触发`set`劫持，`dep`则会遍历前面收集的`subs`，让集合里的观察者执行`update`
-
-### Watcher
-观察者构造函数，该函数的实例`watcher`负责观察实现响应式的可观察对象，<br/>
-`watcher`的value执行它观察的响应式对象。<br/>
-初始化该对象时，会进行一次求值，获取它所观察的对象的值，此时会触发响应式对象的`get`，从而完成依赖收集
-源码分析，
+订阅者对象负责为响应式对象被访问`get`方法触发时，收集依赖、响应式对象被修改时，`set`方法触发派发更新；<br/>
+收集依赖时，把当前的观察者添加到订阅者对象的实例属性`subs`中，<br/>
+派发更新时，遍历它的`subs`通知观察者更新，<br/>
+部分源码如下<br/>
 ```javascript
-class Watcher {
-    constructor() {
-        // 初始化该对象时，会进行一次求值，获取它所观察的对象的值
-        this.value = this.get()
+export default class Dep {
+  addSub (sub: Watcher) {
+    this.subs.push(sub)
+  }
+  depend () {
+    if (Dep.target) {
+      Dep.target.addDep(this)
     }
-    get() {
-        // 把Dep.target指向自己
-        pushTarget(this)
-        let value
-        // 触发收集依赖
-        value = this.getter.call(vm, vm)
-        // 把Dep.target还给上一个watcher
-        popTarget()
+  }
+  notify () {
+    const subs = this.subs.slice()
+    for (let i = 0, l = subs.length; i < l; i++) {
+      subs[i].update()
     }
+  }
 }
 ```
-
-## 派发更新
-响应式对象的set方法被触发，响应式对象的`dep`遍历了它的`subs`，`watcher`便会开始执行它的`update`方法。<br/>
-`update`源码分析，
+### Watcher
+模版渲染时会使用栈的数据结构来维护所有的观察者对象，当前的观察者对象`Dep.target`总是指向栈顶的观察者对象。<br/>
+该对象有几个比较核心的方法，<br/>
+1. get
+当模版解析到组件渲染响应式对象时，会把该组件生成观察者对象。<br/>
+该实例初始化时会进行求值函数，获取响应式对象的值并渲染到模版上。
+求值过程中中，首先吧`Dep.target`指向自身，当访问响应式对象`get`方法被触发时就会把`Dep.target`添加到响应式对象的dep属性对象的`subs`中。<br/>
+```javascript
+get () {
+    // 把dep.target指向自己
+    pushTarget(this)
+    let value
+    const vm = this.vm
+    try {
+      // this.getter就是updateComponent函数
+      value = this.getter.call(vm, vm)
+    } catch (e) {
+      if (this.user) {
+        handleError(e, vm, `getter for watcher "${this.expression}"`)
+      } else {
+        throw e
+      }
+    } finally {
+      // "touch" every property so they are all tracked as
+      // dependencies for deep watching
+      if (this.deep) {
+        traverse(value)
+      }
+      popTarget()
+      this.cleanupDeps()
+    }
+    return value
+  }
+```
+2. update
+当它依赖的响应式对象更新时，响应式对象的订阅者实例遍历subs，通知它执行`update`方法。
 ```javascript
 update () {
-    // 该属性与computed属性有关
+    /* istanbul ignore else */
     if (this.lazy) {
       this.dirty = true
     } else if (this.sync) {
-      // 如果是同步组件，立即更新
       this.run()
     } else {
-      // 添加到批量异步更新队列
       queueWatcher(this)
     }
   }
 ```
 
-`run`和`get`源码分析，(部分源码已忽略，仅保证逻辑通顺)
+3. run
+当观察者对象更新时，update方法会把它更新的行为添加到一个异步队列中，等到同步代码执行完毕才会执行它的`run`方法，从而进行视图更新。
 ```javascript
-    get() {
-        // 将当前watcher压入栈
-        pushTarget(this)
-        // getter也就是updateComponent，在此处触发视图更新
-        value = this.getter.call(vm, vm)
-        return value
+run () {
+    if (this.active) {
+      const value = this.get()
+      if (
+        value !== this.value ||
+        // Deep watchers and watchers on Object/Arrays should fire even
+        // when the value is the same, because the value may
+        // have mutated.
+        isObject(value) ||
+        this.deep
+      ) {
+        // set new value
+        const oldValue = this.value
+        this.value = value
+        if (this.user) {
+          try {
+            this.cb.call(this.vm, value, oldValue)
+          } catch (e) {
+            handleError(e, this.vm, `callback for watcher "${this.expression}"`)
+          }
+        } else {
+          this.cb.call(this.vm, value, oldValue)
+        }
+      }
     }
-    run() {
-        // 获取新的响应式对象，
-        const value = this.get()
-        // 执行更新后的回调
-        this.cb.call(this.vm, value, oldValue)
-    }
+  }
 ```
+
+## 收集依赖
+当模版解析渲染到访问响应式对象的组件时，创建一个观察者实例，该实例把自身推入观察者栈的栈顶，使Dep.target指向自己，接着执行求值函数，<br/>
+访问响应式对象触发`get`，响应式对象的订阅者对象把`Dep.target`添加到响应式对象的`subs`中，并把自身的值返回，<br/>
+接着当前观察者对象推出栈，把`Dep.target`交换给上一个观察者对象，完成依赖收集。
+
+## 派发更新
+当响应式对象更新时，它的订阅者遍历收集到的观察者，调用`update`方法实现派发更新。
+
+
+
 
 注意点<br/>
 **data修改时是如何触发视图更新的？**<br/>
@@ -157,22 +202,18 @@ update () {
 该方法会调用`updateComponent`，同时返回最新的响应式对象的值，就是在该函数调用时触发`patch`，从而视图重新渲染<br/>
 
 ## 总结
-**说一下vue的响应式原理or双向绑定原理**<br/>
-首先调用`observe`函数，把data变为可观察对象，让它实现响应式<br/>
-该函数会把data作为参数传入，调用`Observer`构造方法，为data添加__ob__属性，属性值就是构造函数返回的实例对象。<br/>
-__ob__的`dep`属性是`Dep`函数的实例，同时，`dep`有一个`subs`属性和`addSub`方法和`notify`方法，<br/>
-- `subs`是响应式对象观察者函数的集合
-- `addSub`方法负责把观察者对象添加到`subs`中
-- `notify`方法负责遍历`subs`调用每一个观察者对象的`update`方法
-
-接着获取`data`所有的key，修改每一个`key`的`get`和`set`方法<br/>
-如果`data`的`key`值仍然是一个对象，则会递归调用`observe`，重复刚刚的操作。<br/>
-**为了防止出现循环引用，`observe`会判断当前的对象是否已经有了`__ob__`属性，如果有直接返回该属性值。**<br/>
-然后，通过`Object.defineProperty`，在`get`操作中添加`dep.addSub()`方法，把观察者添加到`subs`属性中，实现收集依赖，<br/>
-在`set`操作中调用`dep.notify()`，遍历`subs`属性，实现派发更新。
-
-如果data是数组，则遍历数组，对每一个元素调用`observe`函数，也就是单独对每一个元素进行响应式操作。<br/>
-当页面开始渲染，观察者实例被创建并开始求值，访问响应式对象时，触发了`get`方法，将当前的观察者添加到响应式对象的`subs`中，在此时就完成了依赖收集。
+首先调用`observe`函数，劫持数据使对象变为响应式对象，
+通过`Object.defineProperty`，劫持`get`和`set`方法。
+如果对象是数组，则遍历数组然后逐个把元素变为可观察对象，并把v2实现数据变化监听的方法添加到数组的原型上。<br/>
+否则获取对象所有的`key`，通过`defineReactive`函数，也就是遍历劫持他们的`get`和`set`属性的核心实现，<br/>
+如果对象的属性值仍然是对象则递归调用`observe`，为了防止循环引用会在劫持前先判断该对象是否拥有`__ob__`属性<br/>
+实现一个订阅者实例，它负责在响应式对象被访问`get`方法触发时，收集依赖、响应式对象被修改时，`set`方法触发派发更新<br/>
+当模版解析到组件渲染响应式对象时，为该组件实现一个观察者对象，<br/>
+该对象初始化时，会把自身推入观察者栈的栈顶，使Dep.target指向自己，接着执行求值函数，触发响应式对象的get方法，<br/>
+然后响应式对象的订阅者会把Dep.target也就是当前的观察者对象添加到它的`subs`数组中，<br/>
+接着，当前观察者对象推出观察者栈，完成依赖收集，并把响应式对象的值返回更新到模版中。<br/>
+当响应式对象更新时，遍历它的订阅者对象的`subs`数组，通知观察者执行`update`方法，<br/>
+`update`方法会把当前观察者添加到一个异步队列中，等到同步代码执行完毕才会执行它的`run`方法，从而进行视图更新。<br>
 
 
 
