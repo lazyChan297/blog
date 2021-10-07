@@ -118,6 +118,7 @@ module.exports = {
             '/engineering/modules/',
             '/engineering/babel/',
             '/engineering/webpack/',
+            '/engineering/RouterLazyLoading/'
           ]
         },
         
