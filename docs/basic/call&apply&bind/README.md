@@ -1,7 +1,7 @@
-# 手写call、apply、bind
+# call、apply、bind实现原理
 
-## 1.call
-**实现思路是给劫持的对象增加fn属性方法,通过context.fn方式调用函数改变this指向并返回运行结果**
+## call
+给劫持的对象增加fn属性方法,通过context.fn方式调用函数改变this指向并返回运行结果
 ```js
 Function.prototype._call = function(context) {
 	if (typeof this !== 'function') return false
@@ -14,8 +14,8 @@ Function.prototype._call = function(context) {
 }
 ```
 
-## 2.apply
-**apply实现思路与call一致,但是需要将以数组结构的参数展开**
+## apply
+apply实现思路与call一致,但是需要将以数组结构的参数展开
 
 ```javascript
 Function.prototype._apply = function(context, array) {
@@ -34,11 +34,10 @@ Function.prototype._apply = function(context, array) {
 }
 ```
 
-## 3.bind
-实现思路
-1. 因为bind的使用方式是先绑定，后调用，所以返回值必须是一个函数
-2. bind的入参方式可以在绑定或者调用时传递，所以通过闭包的形式在返回的参数里访问到绑定时的入参并concat调用时的入参
-3. 绑定后的函数如果以new方式调用时，优先级有高于bind，所以需要通过`instanceof`来判断函数的调用方式改变`this`的指向
+## bind
+- 因为bind的使用方式是先绑定，后调用，所以返回值必须是一个函数
+- bind的入参方式可以在绑定时传入，也可以在调用时传入，所以通过闭包的形式在返回的参数里访问到绑定时的入参并concat调用时的入参
+- 绑定后的函数如果以new方式调用时，优先级高于bind，所以需要通过`instanceof`来判断函数的调用方式，如果是new操作符则改变`this`指向实例
 ```javascript
 Function.prototype._bind = function(context) {
    if (typeof this !== 'function') return false
