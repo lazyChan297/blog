@@ -109,6 +109,7 @@ module.exports = {
             '/networkAngBrowser/garbageCollection/',
             '/networkAngBrowser/MemoryLeak/',
             '/networkAngBrowser/safety/',
+            '/networkAngBrowser/cross-domain/',
           ]
         },
         {
