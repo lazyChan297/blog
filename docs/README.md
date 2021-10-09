@@ -2,14 +2,6 @@
 ::: tip
 记录一些平常工作中学习的笔记，也希望以此养成一个好习惯。
 :::
-
-##### 浏览器与网络
-- [浏览器渲染原理](/networkAngBrowser/http-network/)
-- [https加密原理](/networkAngBrowser/https/)
-- [TCP详解](/networkAngBrowser/http-tcp/)
-- [浏览器缓存机制](/networkAngBrowser/browserCaching/)
-- [垃圾回收机制](/networkAngBrowser/garbageCollection/)
-- [内存泄漏](/networkAngBrowser/MemoryLeak/)
 ##### JavaScript
 - [this的指向](/basic/js-this/)
 - [作用域](/basic/js-scope/)
@@ -24,10 +16,6 @@
 
 ###### 闭包及其应用
 - [防抖函数](/basic/js-throttle&debounce/#防抖)
-
-###### 数组
-- [数组去重](/basic/js-flat&unique/#数组去重)
-- [数组扁平](/basic/js-flat&unique/#数组扁平flat)
 
 ###### ES6+新语法特性
 [Set、Map、WeakSet、WeakMap](/basic/es6-set&map&weakSet&weakMap/)
@@ -65,8 +53,15 @@
 
 ##### 工程化
 - [webpack](/engineering/webpack)
+- [路由懒加载实现原理](/engineering/RouterLazyLoading/)
+- [模块化](/engineering/modules/)
+- [babel](/engineering/babel/)
 
-
-##### 数据结构
-- [二叉树](/algorithm/binaryTree/)
-- [链表](/algorithm/linkedList/)
+##### 浏览器与网络
+- [https加密原理](/networkAngBrowser/https/)
+- [TCP详解](/networkAngBrowser/http-tcp/)
+- [浏览器缓存机制](/networkAngBrowser/browserCaching/)
+- [垃圾回收机制](/networkAngBrowser/garbageCollection/)
+- [内存泄漏](/networkAngBrowser/MemoryLeak/)
+- [安全防范](/networkAngBrowser/safety/)
+- [跨域](/networkAngBrowser/cross-domain/)
