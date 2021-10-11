@@ -6,10 +6,14 @@
 Function.prototype._call = function(context) {
 	if (typeof this !== 'function') return false
   context = context || window
+  // 防止context不是引用类型，无法添加属性
+  context = Object(context)
+  // 防止给context添加属性出现命名冲突
+  let fn = Symbol()
   let args = Array.from(arguments).slice(1)
-  context.fn = this
-  let result = context.fn(...args)
-  delete context.fn
+  context[fn] = this
+  let result = context[fn](...args)
+  delete context[fn]
   return result
 }
 ```
@@ -21,16 +25,20 @@ apply实现思路与call一致,但是需要将以数组结构的参数展开
 Function.prototype._apply = function(context, array) {
   if (typeof this !== 'function') return false
     context = context || window
-    context.fn = this
+    // 防止context不是引用类型，无法添加属性
+    context = Object(context)
+    // 防止给context添加属性出现命名冲突
+    let fn = Symbol()
+    context[fn] = this
     let result
     if (!array || array.length === 0) {
-      result = context.fn()
+      result = context[fn]()
     } else {
       let args = Array.from(arguments).slice(1)
-      result = context.fn(...args)
+      result = context[fn](...args)
     }
-  delete context.fn
-  return result
+    delete context[fn]
+    return result
 }
 ```
 
