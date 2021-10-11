@@ -12,19 +12,19 @@
 - 将脚本随着用户在输入框中的内容一并提交到数据库
 
 #### 防范方法
-1. 可以设置cookie的读取权限使cookie不会随着请求一起发送，从而达到不被通过cookie窃取到用户信息的目的
-- http-only: 只允许http或https请求读取cookie、JS代码是无法读取cookie的，如果通过document.cookie读取，会显示http-only的cookie项被自动过滤掉
-- secure-only: 只允许https请求读取
-- host-only: 只允许主机域名与domain设置完成一致的网站才能访问该cookie
+1. 可以在服务端响应头的`Set-cookie`字段设置cookie的读取权限使cookie不会随着请求一起发送，从而达到不被通过cookie窃取到用户信息的目的
+    - http-only: 只允许http或https请求读取cookie、JS代码是无法读取cookie的，如果通过document.cookie读取，会显示http-only的cookie项被自动过滤掉
+    - secure-only: 只允许https请求读取
+    - host-only: 只允许主机域名与domain设置完成一致的网站才能访问该cookie
 
 2. 对用户的编码进行防御，防止恶意代码通过input输入等方式提交到浏览器执行环境或服务器中
-- 对`&` `<` `>` `"` `'` `/` 转义为实体字符，这样便可以把嵌套到标签的代码过滤
-- 对于富文本输入可以引入`xss`包，会自动过滤
+    - 对`&` `<` `>` `"` `'` `/` 转义为实体字符，这样便可以把嵌套到标签的代码过滤
+    - 对于富文本输入可以引入`xss`包，会自动过滤
 
 3. 设置csp白名单，禁止一切名单外的代码注入执行
-- 在http头部设置Content-Security-Policy
-- 在html的meta标签http-equiv为Content-Security-Policy
-`<meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:">`
+    - 在http头部设置Content-Security-Policy
+    - 在html的meta标签http-equiv为Content-Security-Policy
+    `<meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:">`
 
 
 ### CSRF跨站请求伪造
@@ -36,7 +36,9 @@
 - 诱导用户点击
 
 #### 防范方法
-1. 设置cookie的SameSite属性，`Strict`表示任何情况下都不能作为第三方cookie使用，`Lax`表示通过其它网站跳转过来的时候可以使用cookie
+1. 设置`Set-cookie`的SameSite属性
+    - `SameSite=Strict`表示任何情况下都不能作为第三方cookie使用
+    - `SameSite=Lax`表示通过其它网站跳转过来的时候，只要`a标签链接`、`预加载链接`、`get`请求会发送cookie
 2. 使用token代替cookie，因为token由客户端保存、提交、不会随着请求一起自动发送，只要保证token的安全就可以保证用户信息不被冒充使用
 
 ### 中间人攻击
