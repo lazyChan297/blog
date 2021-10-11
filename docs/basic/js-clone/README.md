@@ -40,17 +40,15 @@ function shallowClone(obj) {
 
 ```javascript
 function cloneDeep(obj, map = new Map()) {
-  const isFunction = (o) => typeof o === 'function' && o !== null
-  const isObject = (o) => typeof o === 'object'
+  const isObject = (o) => Object.prototype.toString.call(o) === '[object Object]'
   const isArray = (array) => Array.isArray(array)
-  if (obj === undefined || obj === null) return obj
   // 非引用类型直接返回值
-  if (!isObject(obj) && !isArray(obj) && !isFunction(obj)) return obj
+  if (!isObject(obj) && !isArray(obj)) return obj
   // 如果已经对该key拷贝直接返回，使用map来防止循环引用
   if (map.get(obj)) return map.get(obj)
   // 返回一个新的内存对象
   let target = isArray(obj)? [...obj] : {...obj}
-  // 当前对象没有被拷贝过，所以保存到key中
+  // 当前对象没有被拷贝过，所以保存到map中
   map.set(obj, target)
   // Reflect.ownKeys可以把symbol属性遍历
   Reflect.ownKeys(target).forEach(key => {
