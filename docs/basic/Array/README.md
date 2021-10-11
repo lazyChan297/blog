@@ -55,6 +55,7 @@ function uniqueByFilter(array) {
 ```javascript
 function uniqueByPerformance(array) {
     // 先把数组升序排序
+    array.sort((a,b) => a-b)
     let i = 0, j = 0
     while(i < array.length) {
         if (array[i] !== array[j]) {
