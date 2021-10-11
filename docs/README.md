@@ -8,6 +8,7 @@
 - [apply,call,bind原理](/basic/call&apply&bind/)
 - [原型链与继承](/basic/js-prototype)
 - [new原理](/basic/js-new)
+- [数组](/basic/Array/)
 ###### 数据类型
 - [数据类型转换机制](/basic/js-implicit/)
 ###### 设计模式
