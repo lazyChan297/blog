@@ -94,3 +94,22 @@ function uniqueByPerformance(array) {
         }, [])
     }
 ```
+
+### 两数求和
+借助双指针技巧，从数组的第0项和第1项开始遍历，i为慢针，j为快针，<br/>
+快针和慢针指向的值相加不等于target时继续循环，每次遍历j向右移动一个位置，<br>
+循环过程中加一个判断条件：当j快针移动到数组末端还没有返回相等的值时，慢针向右移动一个位置，<br>
+快针指向慢针位置再向右移动一个位置，这样做的目的是保证慢针移动后，快针总是从慢针下一个位置开始遍历
+```javascript
+var twoSum = function(nums, target) {
+    let i = 0, j = 1
+    while(nums[i] + nums[j] !== target) {
+        if (j === nums.length - 1) {
+            i++
+            j = i
+        }
+        j++
+    }
+    return [i,j]
+}
+```
