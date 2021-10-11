@@ -30,7 +30,7 @@ function shallowClone(obj) {
 ### `JSON.parse(JSON.stringify(obj))`
 如果已知数据结构没有`undefined`、`循环引用`、`Symbol类型`、`function`则可以使用这种方式，非常简单便捷，但是缺点也就是不能实现以上的类型拷贝
 
-### DeepClone
+### cloneDeep
 实现一个深拷贝函数，满足以下条件<br/>
 - 满足symbol类型的拷贝
 - 支持循环引用的对象
@@ -39,21 +39,23 @@ function shallowClone(obj) {
 实现逐层拷贝的思路是使用递归，只要不是基本类型，继续递归
 
 ```javascript
-function DeepClone(obj, map = new Map()) {
+function cloneDeep(obj, map = new Map()) {
+  // your code here
   const isFunction = (o) => typeof o === 'function' && o !== null
   const isObject = (o) => typeof o === 'object'
   const isArray = (array) => Array.isArray(array)
+  if (obj === undefined || obj === null) return obj
   // 非引用类型直接返回值
-  if (!isObject && !isArray && !isFunction) return obj
+  if (!isObject(obj) && !isArray(obj) && !isFunction(obj)) return obj
   // 如果已经对该key拷贝直接返回，使用map来防止循环引用
   if (map.get(obj)) return map.get(obj)
   // 返回一个新的内存对象
-  let target = isArray(obj)? [] : {...obj}
+  let target = isArray(obj)? [...obj] : {...obj}
   // 当前对象没有被拷贝过，所以保存到key中
-  map.set(data, target)
+  map.set(obj, target)
   // Reflect.ownKeys可以把symbol属性遍历
-  Reflect.ownKeys(target).foEach(key => {
-    target[key] = isFunction(target[key]) ? target[key] : isObject(target[key]) ? DeepClone(target[key], map) : target[key]
+  Reflect.ownKeys(target).forEach(key => {
+    target[key] = (isObject(target[key]) || isArray(target[key])) ? cloneDeep(target[key], map) : target[key]
   })
   return target
 }
@@ -88,8 +90,7 @@ function isEqual(a, b, map = new Map()) {
     let a_keys = Reflect.ownKeys(a)
     let b_keys = Reflect.ownKeys(b)
     if (a_keys.length !== b_keys.length) return false
-    // 不能用forEach,否则不相等时无法跳出本次循环,for可以
-    // 使用for遍历keys的数组，所以是a[a_keys[i]]才能取到对应的值
+    // 不能用forEach,否则不相等时无法跳出本次循环;可以使用for遍历keys的数组，所以是a[a_keys[i]]才能取到对应的值
     for(let i =0; i < a_keys.length; i++) {
       if (!isEqual(a[a_keys[i]], b[b_keys[i]], map)) return false
     }
