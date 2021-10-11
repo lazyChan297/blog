@@ -40,7 +40,6 @@ function shallowClone(obj) {
 
 ```javascript
 function cloneDeep(obj, map = new Map()) {
-  // your code here
   const isFunction = (o) => typeof o === 'function' && o !== null
   const isObject = (o) => typeof o === 'object'
   const isArray = (array) => Array.isArray(array)
