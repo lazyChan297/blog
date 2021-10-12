@@ -113,3 +113,26 @@ var twoSum = function(nums, target) {
     return [i,j]
 }
 ```
+### indexOf
+使用二分查找的方式实现indexOf方法，通过把数组排序变为升序的，然后取出中间的元素与目标元素比较，定位左指针为0，右指针为数组末端
+在左指针小于等于右指针的条件下循环，
+    中间元素<目标元素，右指针移动到中间元素索引-1，
+    中间元素>目标元素，左指针移动到中间元素索引+1，
+    每次取出更新后的右指针至左指针区域的中间值，`(右指针-左指针)/2+左指针`，比较中间元素如果等于目标值返回
+```javascript
+var searchIndexOf = (nums, target) => {
+    let left = 0, right = nums.length-1
+    while(left <= right) {
+        const mid = Math.floor((right - left) / 2) + left
+        const num = nums[mid]
+        if (num === target) {
+            return mid
+        } else if (num > target) {
+            right = mid - 1
+        } else {
+            left = mid + 1
+        }
+    }
+    return -1
+}
+```
