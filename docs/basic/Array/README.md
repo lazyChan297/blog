@@ -31,9 +31,12 @@
 
 `reduceRight` 执行过程和`reduce`一致，只是索引从高到低开始
 
-`sort` 接受一个比较函数作为参数。如果不传比较函数会将元素转换为字符串的Unicode位点进行比较。
-如果传入比较函数，比较函数接收`第一个比较的值，第二个比较的值`作为参数，如果两个值相减，小于0的1和2参数位置调换，如果等于0不变，如果大于0，第二个参数在第一个参数后面
-该方法返回值是原来的数组，如果重新定义一个变量赋值给该方法执行后的返回值内存地址指向的也和原数组<br/>
+`sort` 接受一个比较函数作为参数。如果不传比较函数会将元素转换为字符串，调用unicode位点进行比较
+如果传入比较函数，比较函数接收`a，b`两个比较值作为参数，通过该函数返回调整`a` `b`的位置，需要注意的是`a`是原数组中比较值`b`后紧随的元素
+- `<0` a在b前面，升序排列`(a,b) => a-b`
+- `=== 0` 位置不变
+- `>0` b在a前面 降序排序 `(a,b) => b-a`<br/>
+
 如果是稀疏数组不会对不存在的元素执行回调函数
 
 ## 常用的数组处理方法
@@ -113,6 +116,45 @@ var twoSum = function(nums, target) {
     return [i,j]
 }
 ```
+
+### 交集
+先对数组1遍历保存到map对象中，记录它的值和个数。接着对数组2遍历，如果数组2的元素存在map对象中，则添加到新数组，并且map对应的值减1
+```javascript
+function intersect(arr1, arr2) {
+    let map = {}, result = []
+    arr1.forEach(item => {
+      if (map[item] > 0) {
+        map[item]++
+      } else {
+        map[item] = 1
+      }
+    })
+    arr2.forEach(item => {
+      if(map[item] > 0) {
+        result.push(item)
+        map[item]--
+      }
+    })
+    return result
+  }
+```
+
+### 随机打乱顺序
+遍历数组时，每次获取一个范围`[0, 当前索引]`的随机数，然后将当前索引元素和随机数索引元素交换位置
+```javascript
+function shuffle(arr) {
+    const getRandomInt = (max, min) => {
+        return Math.floor(Math.random() * ((max - min) + 1))
+    }
+    for (let i = 0; i < arr.length; i++) {
+        const j = getRandomInt(0, i)
+        const temp = arr[i]
+        arr[i] = arr[j]
+        arr[j] = temp
+    }
+    return arr
+}
+```
 ### indexOf
 使用二分查找的方式实现indexOf方法，通过把数组排序变为升序的，然后取出中间的元素与目标元素比较，定位左指针为0，右指针为数组末端
 在左指针小于等于右指针的条件下循环，
@@ -135,4 +177,34 @@ var searchIndexOf = (nums, target) => {
     }
     return -1
 }
+```
+
+### 合并两个有序数组
+1. 使用两枚指针，在两枚指针都小于指定的合并索引的条件下循环，获取两枚指针当前指向的值比较，取出小的值push到新的数组中
+2. 如果某一枚指针等于它的合并索引后，取出另一个数组的指针指向的值添加到数组中
+3. 添加到新数组的索引是两枚指针相加-1，-1是因为为移动数组下一次循环指针加1，但是实际放入新数组时索引应该是两枚指针和
+4. 遍历新数组，把对应的值更新到nums1上
+```javascript
+    var merge = function(nums1,m, nums2, n) {
+        let p1 = 0, p2 = 0
+        // 创建新数组替换
+        const sorted = Array.from(m + n).fill(0)
+        while(p1 < m || p2 < n) {
+            let current
+            if (p1 === m) {
+                current = nums2[p2++]
+            } else if (p2 === n) {
+                current = nums1[p1++]
+            } else if (nums1[p1] < nums2[p2]) {
+                current = nums1[p1++]
+            } else {
+                current = nums2[p2++]
+            }
+            sorted[p1 + p2 - 1] = current
+        }
+        for (let i = 0; i < sorted.length; i++) {
+            nums1[i] = sorted[i]
+        }
+        return nums1
+    }
 ```
