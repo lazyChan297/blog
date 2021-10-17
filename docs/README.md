@@ -33,7 +33,7 @@
 - [函数柯里化](/basic/js-curry)
 ##### CSS
 - [布局](/css/css-layout/)
-- [文档流](/css/css-basics/)
+- [盒子模型/文档流/BFC](/css/css-basics/)
 - [动画](/css/css-animation/)
 
 ##### 框架

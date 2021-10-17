@@ -1,35 +1,73 @@
-# css的布局方式
+# 布局
 
-## flex布局
+## Flex
+### 父属性说明
+- **flex-direction** 决定主轴的排列方式，
+    1. row横向（默认）、column纵向
+    2. row-reverse（横向，起点在右）、column-reverse（纵向，起点在下） 
 
-| 属性名          | 含义                                               | 属性值                                                       |
-| --------------- | -------------------------------------------------- | ------------------------------------------------------------ |
-| flex-direction  | 决定主轴的排列方式                                 | row横向（默认）;row-reverse横向，起点在右；column纵向；column-reverse纵向，起点在下 |
-| flex-wrap       | 排列是否换行                                       | nowrap不换行（默认）；wrap换行；wrap-reverse换行，第一行在下方 |
-| flex-flow       | flex-direction和flex-wrap的简写                    | row nowrap；（默认）                                         |
-| justify-content | 在主轴上的对齐方式                                 | flex-start左对齐（默认）；flex-end右对齐；center居中；space-between；两端对齐，元素间隔相等；space-around元素两侧间隔相等 |
-| align-items     | 在纵轴上的对齐方式                                 | flex-start与纵轴起点对齐；flex-end与纵轴终点对齐；center与纵轴中间对齐；baseline与项目第一行文字对齐；stretch如果项目未设置高度或设为auto，将占满整个容器的高度（默认）。 |
-| align-content   | 多根轴线情况下的对齐方式，只有一根轴线时该属性无效 | flex-start与纵轴起点对齐；flex-end与纵轴终点对齐；center与纵轴中间对齐；space-between与交叉轴两端对齐，轴线之间的间隔平均分布；space-around每根轴线两侧的间隔都相等，轴线之间的间隔比轴线与边框的间隔大一倍；stretch轴线占满整个交叉轴（默认值） |
-| order           | 元素排列顺序                                       | 数值越小，排序越前，默认是0                                  |
-| flex-grow       | 元素放大比例                                       | 默认值0，即使存在剩余空间，也不放大；1：等分剩余空间；2：等分的空间为两倍 |
-| flex-shrink     | 元素缩小比例                                       | 默认值1，如果空间不足会缩小；0:空间不足时不缩小              |
-| flex-basis      | 分配多余空间时，分配主轴的空间                     | 默认值auto，元素原本的大小；也可以设置npx                    |
-| flex            | flex-grow和flex-shrink和flex-basis的简写           | 默认值0 1 auto                                               |
-| align-self      | 覆盖父元素的align-items                            | 默认值aotu，继承父元素，如果没有父元素，等同stretch；其余属性值与align-items一致 |
+- **justify-content** 主轴的对齐方式
+    1. flex-start左对齐（默认）
+    2. flex-end右对齐
+    3. center居中
+    4. space-between；两端对齐，元素间隔相等
+    5. space-around元素两侧间隔相等
 
-## grid布局
-父元素属性
-grid-template-columns: 有几个值代表有几列，对应的值就是该列的高度
-grid-template-rows: 有几个值代表有几行，对应的值就是该行的宽度
-```css
-.content {
-    display: grid;
-    grid-template-columns: 100px 100px 100px;
-    grid-template-rows: 50px 50px;
-}
-```
-子元素属性
-grid-row-start: n 表示用网格的第n条横轴开始定位
-grid-row-end: n 表示用网格的第n条横轴结束定位
-grid-column-start: n 表示用网格的第n条纵轴轴开始定位
-grid-column-end: n 表示用网格的第n条横轴开始定位
+- **align-items** 与主轴垂直交叉的轴线的对齐方式
+    1. stretch如果元素未设置高度或设为auto，将占满整个容器的高度（默认）
+    2. flex-start 与该轴起点对齐
+    3. flex-end 与该轴终点对齐
+    4. center 与该轴中间对齐
+    5. baseline与第一行文字对齐
+
+- **align-content** 多根与主轴垂直交叉的轴线对其方式，如果只有一根轴该属性无效
+    1. stretch轴线占满整个交叉轴（默认值） 
+    2. flex-start与纵轴起点对齐
+    3. flex-end与纵轴终点对齐
+    4. center与纵轴中间对齐 
+    5. space-between与交叉轴两端对齐，轴线之间的间隔平均分布
+    6. space-around每根轴线两侧的间隔都相等，轴线之间的间隔比轴线与边框的间隔大一倍
+
+- **flex-wrap** 决定主轴排列是否换行
+    1. nowrap不换行（默认）
+    2. wrap换行
+    3. wrap-reverse换行，第一行在下方
+
+- **flex-flow** `flex-direction`和`flex-wrap`的合并，默认值是`row nowrap`
+
+### 子属性说明
+
+- **flex-grow** 元素放大比例
+    - 默认值0，存在剩余空间不放大
+    - 计算法则
+        - `剩余空间 = 父容器空间 - 所有子项空间的总和`
+        - `可伸展大小 = 剩余空间 / 所有子元素的系数总和`
+        - `子项伸展后的空间 = 子项自身的空间 + 子项伸展系数 * 可伸展大小`
+- **flex-shrink** 元素缩小比例
+    - 默认值1，如果空间不足会以1为系数收缩，`收缩后的空间 = 当前子项空间 - 1 * （溢出的空间/所有子项个数）`
+    - 0，空间不足时也不会对子元素收缩
+    - 计算法则
+        - `溢出的空间 = 所有子项空间加起来的总和 - 父容器空间`
+        - `权重 = 所有子项空间*该子项收缩系数的总和`
+        - `当前子元素收缩空间 = 溢出的空间 * 当前子元素空间 * 收缩系数 / 权重`
+        - `收缩后的空间 = 当前子元素原本空间 - 当前子元素收缩空间`
+
+- **flex-basis** 在不伸缩情况下子元素基准的大小，横向排列时代表宽度，纵向排列代表高度，如果设置了百分比则以父容器的空间为基准，默认是`auto`，代表由自身内容大小决定
+
+- **flex** `flex-grow` `flex-shrink` `flex-basis` 三个属性的合并缩写
+    - 单值语法
+        - 只有1个无单位数字时，值对应的是`flex-grow`，其它值默认
+        - 只有1个值有单位数字时，值对应的是`flex-basis`，其它值默认
+        - 只要1个关键字值时，`none` => `0 0 auto`，`auto` => `1 1 auto`，`initial` => `0 1 auto`
+    - 双值语法
+        - 1个无单位数字，1个有单位数字，对应的值是`flex-grow`，`flex-basis`
+        - 都是无单位数字，对应的值是`flex-grow`，`flex-shrink`
+- **align-self** 覆盖父元素的align-items，属性值与align-items一致
+
+## Grid
+### 父元素属性
+- **grid-template-columns** 有几个值代表有几列，对应的值就是该列的列宽，`repeat(n, 100px)`等于重复定义n个100px的值
+- **grid-template-rows** 有几个值代表有几行，对应的值就是该行的行高，`repeat(n, 100px)`等于重复定义n个100px的值
+
+### 子元素属性
+- **grid-row-start/grid-row-end/grid-column-start/grid-column-end** 从网格的第n条横轴/纵轴，开始/结束定位
