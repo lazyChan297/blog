@@ -7,6 +7,7 @@
 如果权重相加一致，那么就以最新的样式表为准
 
 - 伪类选择器，选择的是真实存在dom结构上，且满足逻辑判断标识的元素，例如第一个子元素 `:first-child`
+
 - 伪元素，是不存在dom结构中添加的虚拟元素，例如`::after`和`::before`用来在元素节点前后添加一个虚拟的元素，`::placeholder`是选择input标签的文字占位符
 [详细的列表可以查看该规范](https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/Selectors/Pseudo-classes_and_pseudo-elements)
 
@@ -50,9 +51,15 @@
 3. 里面的元素与外面的元素相互独立，不受影响 <br />
    
 ## 盒子模型
-CSS中每一个元素被视为一个矩形盒子，盒子包含了`padding` `border` `content`<br>
-**标准盒子模型** 默认值，`box-sizing: content-box`设置width只会赋值给`content`，不包含`padding` `border`的值，height同理<br>
-**怪异盒子模型** `box-sizing:border-box`，设置width包含了`padding` `border` `content`，`content = width - padding*2 - border*2`的值，高度同理<br>
+CSS中每一个元素被视为一个矩形盒子，盒子包含了`padding` `border` `content` `margin`
+- **标准盒子模型** 默认值，`box-sizing: content-box`设置width只会赋值给`content`，不包含`padding` `border`的值，height同理
+
+- **怪异盒子模型** `box-sizing:border-box`，设置width包含了`padding` `border` `content`，`content = width - padding*2 - border*2`的值，高度同理<br>
+
+- **`auto`值的计算** 块级盒子满足该等式
+`margin-left`+`border-left-width`+`padding-left`+`width`+`padding-right`+`border-right-width`+`margin-right`=`width of containing block`<br/>
+当且仅当有一个其中某一个属性值为auto时，该auto的值令该等式成立，等于<br/>
+`margin-left` = `width of containing block`-`border-left-width`-`padding-left`-`width`-`padding-right`-`border-right-width`-`margin-right`
 
 ## 关于属性的百分比属性值
 对不同的属性设置百分比有不同的基准
