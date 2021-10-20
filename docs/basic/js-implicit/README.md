@@ -1,55 +1,43 @@
 # 数据类型转换机制
 
-## 触发隐式转换的场景
-1. 字符串连接符和算术运算符
-2. 关系运算符比较，左右两边的数据类型不一致
-3. 逻辑非`!`运算符
+## 显式转换
+- `Number()`
+    - 原始类型
+        - **string** 非空可以解析为相应的数字那么就是对应数字的值，如果其中有一个非数字那么就会转换为`NaN`，`let a = Number('1a') // NaN`，与parseInt不同 `let a = parsrInt('1a') // 1`，空字符串转换为0
+        - **boolean** Number(true) => 1 Number(false) => 0
+        - **symbol** 不能转换 会报错
+    - 引用类型 **先调用自身类型的`valueOf`方法，如果获取的值不是原始类型，再调用自身类型的toString方法，接着将字符串规则转换**
+        - **对象**`Object.valueOf()` 返回对象本身， `Object.toString()` 返回 `[object 对象类型]`
+            - `Number({}) => NaN`
+        - **数组**`Array.valueOf()` 返回数组本身，`Array.toString()`返回数组元素拼接的字符串用,分隔
+            - `Number([1]) => 1` `Number([1,2,3]) => NaN`
+- `String`
+    - 原始类型
+        - **number** 转换为数字字符串
+        - **boolean** 转换为"true" 或者 "false"
+        - **undefined** 转换为"undefined"
+        - **null** 转换为"null"
+    - 引用类型  **调用对象自身类型的`toString`方法，如果是原始类型则调用String函数，如果不是则调用该对象自身类型的valueOf方法，如果得到原始类型再调用String函数，如果toString和valueOf返回的仍然是引用类型就会报错**
+- `Boolean` 只有这几种情况会转换为false `null`、`undefined`、 `0`、 `-0`、 `NaN`、 `''`，其它全部是true
+## 隐式转换
+隐式转换的规则与显式转换一致，区别在于不是用户主动调用的，而是在以下操作中自动触发
+1. 不同类型数据相加
+    - 如果+号的一边是字符串，那么另一边也会转换为字符串相加，`'1'+true => '1true'` 
+    - 如果+号的一边是数字，那么另一边会自动转换为数字相加，`1 + true => 2`
+    - 如果+号的有引用类型，会对该引用类型调用自身的valueOf和toString，接着按照字符串相加的规则执行
+2. 对非数值类型使用一元运算符，会自动按照number()函数的转换规则执行
+3. **if语句**、**否定运算符!**、**三目运算符** 会自动转换为boolean
+4. 比较运算符 先转换为数字再进行比较，如果运算子是引用类型，先调用自身的valueOf，如果还是对象则调用自身的toString
+5. 相等运算符`==`和不相等运算符`!=`
+    - 字符串或布尔值与数字比较，都会自动转换为数字
+    - 引用类型与原始类型比较
+        - 与字符串比较，先调用自身的valueOf和toString得到原始值，`let a = {}; a == '[object Object] // true`
+        - 与数字比较，引用类型转换后的字符串再调用一次Number函数得到数字再进行比较
+            - `[] == 0; //true, Number([].valueOf().toString()) => 0`
+            - `![] == 0; //true, ![] => false, Number(false) => 0`
+            - `[] == ![]; //true, Number([].valueOf().toString()) => 0, ![]=>false,Number(false) => 0`
+    - 引用类型与引用类型比较，不会触发类型转换，仅仅比较它们的引用对象是否是同一个
 
-## 转换规则
-1. 字符串连接符`+`操作时，会把其他类型转换为`String`再进行拼接
-2. 算术运算符号操作时`+` `-` `*` `/` `%`，会把其他类型转换为`Number`再进行相加
-3. 关系运算符操作时`>` `==` `!=` `<`，会把其他类型转换为`Number`再进行比较
-4. 逻辑运算符操作时`!`，会把其他类型转换为`Boolean`再进行比较
-5. 引用类型在进行隐式转换时，会先调用`valueOf()`方法获得原始值，如果原始值不是`Number`类型则使用`toString()`方法转成字符串，再将字符串转换成number
 
-## example
-- 字符串连接符，会把不是字符串类型的数据转换为string再相加
-`1 + 'true' = '1true'`
-- 算术运算符，会把不是数字类型的数据转换为number再相加
-`1 + true = 2` 
-`false + false = 0`
-- 关系运算符，会把不是数字类型的数据转换为number再进行比较。
-（注意，如果关系运算符两边都是字符串，则字符串会调用`charCodeAt()`而不是`Number()`
-```javascript
-'a' > 'b' // false
-'a'.charCodeAt() // 97
-'b'.charCodeAt() // 98
-// 相等于
-'a'.charCodeAt() > 'b'.charCodeAt() // false
-```
-- 引用类型
-```javascript
-let a = {}
-// a.valueOf().toString()
-a == '[object Object]' // true
-```
-```javascript
-// [].valueOf().toString // '' => Number('') => 0
-[] == 0 // true
-// ![] 空数组转布尔值得到true，逻辑非取反得到false false隐式转转为number变成0
-![] == 0 // true
-
-// [] 空数组转换为number变成0，![]隐式转换变为false，false再隐式转换变为0
-[] == ![]
-// 相同的数据类型不会触发隐式转换
-[] == [] 
-```
-
-## 布尔值转换
-| 数据类型          | 转换为true                  | 转换为false  |
-| ---------------  | ------------------------- | -------------|
-| String           | 非空字符串                  | 空字符串|
-| Number           | 非零的值                    | 0，NaN |
-| Object           | 非空对象(注意包括{})          | null |
 
 
