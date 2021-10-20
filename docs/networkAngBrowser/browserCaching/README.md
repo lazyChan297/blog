@@ -10,19 +10,20 @@
 如果service worker匹配了缓存，那么会拦截网络请求，直接返回匹配缓存资源的文件。如果没有使用service worker，那么根据Http Header判断使用哪种缓存策略来获取资源
 
 ## 强弱缓存
-根据是否需要向服务器发起请求区分了强弱缓存，强缓存不会发起直接返回缓存资源，而是从memory cache 或 disk cache中获取资源，返回200。弱缓存则携带缓存标识向服务器发起请求，服务器根据`Etag`或判断资源是否更新，没有更新无内容返回，返回304；更新则返回最新资源，返回200
+根据是否需要向服务器发起请求区分了强弱缓存，强缓存不会发起直接返回缓存资源，而是从memory cache 或 disk cache中获取资源，返回200。弱缓存则携带缓存标识向服务器发起请求，服务器根据`Etag`或`Last-Modified`判断资源是否更新，没有更新无内容返回，返回304；更新则返回最新资源，返回200
 ### 强缓存
 实现的方式有两种，第一种通过expires结合Last-Modified进行比较资源是否过期，这两个标识会携带在服务端的response头部中 <br/>
 ::: tip 字段说明
 Expires: 服务端response携带的标识，表示该资源在服务端过期时间 <br/>
 Last-Modified: 该资源在服务端最后一次修改的时间
 :::
+如果上一次修改资源时间和资源有限缓存时间判断。
 
 第二种通过设置Cache-Control字段里的值来实现，`no-cache`表示不使用强缓存
 ::: tip Cache-Control字段说明
 - public 浏览器&客服端都可以缓存
 - private 只有浏览器可以缓存
-- max-age=300 缓存30秒后过期需要重新缓存
+- max-age=300 缓存5分钟后过期需要重新缓存
 - s-maxage=300 与max-age一致，但只在代理服务器生效
 - no-store 不缓存任何内容
 - no-cache 使用Etag or Last-Modified判断
