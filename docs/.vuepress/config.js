@@ -111,6 +111,7 @@ module.exports = {
             '/networkAngBrowser/MemoryLeak/',
             '/networkAngBrowser/safety/',
             '/networkAngBrowser/cross-domain/',
+            '/networkAngBrowser/http-message/'
           ]
         },
         {
