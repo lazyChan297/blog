@@ -1,21 +1,24 @@
 # 浏览器缓存机制
 
 ## 缓存的位置和读取顺序
-1. service worker
-    (关于service worker的介绍可以看这个[service worker 是什么](https://zhuanlan.zhihu.com/p/115243059))
-2. memory cache
-3. dick cache
-4. push cache
+- **service worker**
+  运行在浏览器的独立线程中，可以根据自己的需求来匹配缓存的内容、读取缓存。当用户访问资源前拦截请求，如果缓存生效则读取缓存的文件，否则发起请求<br/>
+- **memory cache** 内存中的缓存，一旦该进程被释放缓存就失效，读取速度快但是由于占用CPU内存所以可以缓存的资源很有限
+- **dick cache** 硬盘缓存读取速度慢于内存，但是存储容量和保存时效都要优于内存缓存
+- **push cache**
 
-## 缓存机制
+如果service worker匹配了缓存，那么会拦截网络请求，直接返回匹配缓存资源的文件。如果没有使用service worker，那么根据Http Header判断使用哪种缓存策略来获取资源
 
+## 强弱缓存
+根据是否需要向服务器发起请求区分了强弱缓存，强缓存不会发起直接返回缓存资源，而是从memory cache 或 disk cache中获取资源，返回200。弱缓存则携带缓存标识向服务器发起请求，服务器根据`Etag`或判断资源是否更新，没有更新无内容返回，返回304；更新则返回最新资源，返回200
 ### 强缓存
-实现的方式有两种，第一种通过expires和Last-Modified进行比较资源是否过期，这两个标识会携带在服务端的response头部中 <br/>
+实现的方式有两种，第一种通过expires结合Last-Modified进行比较资源是否过期，这两个标识会携带在服务端的response头部中 <br/>
 ::: tip 字段说明
 Expires: 服务端response携带的标识，表示该资源在服务端过期时间 <br/>
 Last-Modified: 该资源在服务端最后一次修改的时间
 :::
-第二种通过设置Cache-Control字段里的值来实现
+
+第二种通过设置Cache-Control字段里的值来实现，`no-cache`表示不使用强缓存
 ::: tip Cache-Control字段说明
 - public 浏览器&客服端都可以缓存
 - private 只有浏览器可以缓存
@@ -26,6 +29,8 @@ Last-Modified: 该资源在服务端最后一次修改的时间
 - max-stale=30 能够容忍的最大过期时间，表示浏览器愿意接收一个最多过期30秒的资源
 - min-fresh=30 能够容忍的最小新鲜度，表示浏览器不愿意接受新鲜度小于30秒的资源
 :::
+
+`Cache-Control`和`Expires`同时存在时，`Cache-Control`的优先级高于`Expires`，如果当前环境是不支持HTTP1.1的环境，那么会使用`Expires`
 
 ### 协商缓存
 当强缓存失效后，浏览器会携带一些字段向服务器发起请求，根据字段值来决定是否返回资源
@@ -67,4 +72,4 @@ Last-Modified: 该资源在服务端最后一次修改的时间
 经常修改的资源，可以使用`Cache-Control: no-cache`，结合需求给response配置标识 <br/>
 
 ## 参考内容
-[深入理解浏览器的缓存机制](https://www.jianshu.com/p/54cc04190252)
+[关于service worker](https://zhuanlan.zhihu.com/p/115243059)
