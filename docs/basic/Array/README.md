@@ -208,3 +208,28 @@ var searchIndexOf = (nums, target) => {
         return nums1
     }
 ```
+
+### 旋转数组
+在空间复杂度O(1)的前提下，使用环状替换的方法旋转。
+- 总共遍历a圈，每圈长度是n，每圈遍历b个元素，每个元素移动k步，a*n = k*b，当一圈结束后就要开始下一次遍历所以a要尽可能小，所以a*n是n和k的最小公倍数
+- 每圈遍历的个数 = n和k的最小公倍数 / k
+- 为保证每个元素都会被遍历，遍历的次数= `n/每圈遍历的个数` = `n/(n和k的最小公倍数/k)`
+```javascript
+var rotate = function(nums, k) {
+    const n = nums.length;
+    const gcd = (x, y) => y ? gcd(y, x % y) : x
+    // 遍历次数
+    const count = gcd(k, n)
+    for (let start = 0; start < count; start++) {
+        let current = start
+        let prev = nums[start]
+        do {
+            let next = (current + k) % n
+            let temp = nums[next]
+            nums[next] = prev
+            prev = temp
+            current = next
+        } while(start !== current)
+    }
+};
+```
