@@ -140,3 +140,43 @@ function isValidIp(str) {
     return ipv4Reg.test(str) || ipv6Reg.test(str)
 }
 ```
+
+### 找出连续出现最多的字符和个数, 以对象形式返回
+- `'aaaccccccvxxxx' => {c:6}`
+`'aabbcc' => {a:2,b:2,c:2}`
+```JavaScript
+function findCharMax(string) {
+    // 1*表示与前面的小括号的匹配项内容相同
+    let reg = /(\w)\1*/g
+    // 返回一个以相同字符串为1个元素的数组
+    let charArr = string.match(reg)
+    // 找到出现最多的字符
+    let max = Math.max(...charArr.map(s => s.length))
+    return charArr.reduce((prev, cur, index) => {
+        if (cur.length === max) {
+            return {...prev, [cur.substring(0,1)]: max}
+        }
+        return prev
+    }, {})
+}
+```
+
+### 压缩字符串
+- `'a' -> 'a'` `'aa' -> 'a2'` `'aaa' - 'a3'`
+- `'aaab' -> 'a3b'`
+- `'aaabba' -> 'a3b2a'`
+```JavaScript
+function findCharMax(string) {
+    // 1*表示与前面的小括号的匹配项内容相同
+    let reg = /(\w)\1*/g
+    // 返回一个以相同字符串为1个元素的数组
+    let charArr = string.match(reg)
+    return charArr.reduce((prev, cur, index) => {
+        if (cur.length === 1) {
+            return prev += cur.substring(0, 1)
+        } else {
+            return prev += cur.substring(0, 1) + cur.length
+        }
+    }, '')
+}
+```
