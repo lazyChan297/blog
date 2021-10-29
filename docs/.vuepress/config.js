@@ -104,8 +104,10 @@ module.exports = {
           collapsable: true,
           children: [
             '/networkAngBrowser/http-network/',
+            '/networkAngBrowser/HTTP/',
             '/networkAngBrowser/https/',
             '/networkAngBrowser/http-tcp/',
+            '/networkAngBrowser/http-dns/',
             '/networkAngBrowser/browserCaching/',
             '/networkAngBrowser/garbageCollection/',
             '/networkAngBrowser/MemoryLeak/',
