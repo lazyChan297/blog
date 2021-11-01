@@ -1,6 +1,7 @@
-# CSS
+# CSS其它记录
 
 ## 选择器
+
 **优先级**
 
 `!important` -> `内联（1000）` -> `id(0100)` -> `类,伪类,属性选择器（0010）` -> `元素,伪元素（0001）` -> `通配符(0000)` 
@@ -12,6 +13,7 @@
 [详细的列表可以查看该规范](https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/Selectors/Pseudo-classes_and_pseudo-elements)
 
 **解析顺序**
+
 从右到左解析，例如，`.list li {}` 会先匹配li标签，接着匹配类名list
 如果从左到右解析，从css dom的根节点开始查找，当匹配到某一个子节点不符合时回溯到根节点重新查询这样会使查询的时间增加很多，如果从右到左解析，从则从一开始就筛选掉很多不匹配规则的元素，明显的减少了性能上的损耗
 
@@ -45,10 +47,9 @@
 4. 除了overflow: visible以外的值
 
 **布局规则**
-1. 解决margin重叠，内部的元素会在垂直方向上排列，排列的间隔由上下两个元素之间的margin会折叠以值大的为准
-2. 解决float引起的重叠，计算bfc高度时，float元素的高度也会包含在内<br/>
-   由此可以实现两栏布局/三栏布局，但是有更好的实现方式（flex布局）
-3. 里面的元素与外面的元素相互独立，不受影响 <br />
+1. 解决margin重叠（当元素垂直排列时排列的间隔由上下两个元素之间的margin会折叠以值大的为准）
+2. 解决float引起的重叠，计算bfc高度时，float元素的高度也会包含在内，由此可以实现两栏布局/三栏布局，但是有更好的实现方式[Flex布局](/css/Flex/)
+3. BFC内的元素与外面的元素相互独立，不受影响
    
 ## 盒子模型
 CSS中每一个元素被视为一个矩形盒子，盒子包含了`padding` `border` `content` `margin`
@@ -69,3 +70,10 @@ CSS中每一个元素被视为一个矩形盒子，盒子包含了`padding` `bor
 | margin/padding/left/right| 父级的width| 
 | top/bottom/height| 父级的height|
 | line-height|自身字体大小|
+
+## display/opacity/visibility
+| 属性|  性能| 对子孙节点的影响|
+| ---- | ---- | -----------|
+| display| 会引起浏览器回流，因为Dom结构改变，none时不再占位|不具备继承性，随父节点消失|
+| opacity| 使用GPU线程绘制，性能最优，值为0时依然占位|不具备继承性，随父节点消失| 
+| visibility| 会引起浏览器重绘，hidden时依然占位|具备继承性，子孙节点可以重新赋值可见|

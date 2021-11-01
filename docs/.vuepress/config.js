@@ -131,10 +131,10 @@ module.exports = {
           title: 'CSS',
           collapsable: true,
           children: [
-            "/css/css-basics/",
             "/css/Flex/",
             "/css/Grid/",
-            "/css/CSS3Animation/"
+            "/css/CSS3Animation/",
+            "/css/css-basics/"
           ]
         },
         {
