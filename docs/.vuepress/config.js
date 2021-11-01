@@ -128,12 +128,13 @@ module.exports = {
         },
         
         {
-          title: 'css',
+          title: 'CSS',
           collapsable: true,
           children: [
             "/css/css-basics/",
-            "/css/css-layout/",
-            "/css/css-animation/"
+            "/css/Flex/",
+            "/css/Grid/",
+            "/css/CSS3Animation/"
           ]
         },
         {
