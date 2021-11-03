@@ -93,6 +93,18 @@ module.exports = {
           ]
         },
         {
+          title:'网络',
+          collapsable: true,
+          children: [
+            "/Network/OSI&TCP/",
+            "/Network/TCP&UDP/",
+            "/Network/DNSSearch/",
+            "/Network/HTTP/",
+            "/Network/HTTPS/",
+            "/Network/Http-Message/"
+          ]
+        },
+        {
           title: 'node',
           collapsable: true,
           children: [
@@ -100,20 +112,15 @@ module.exports = {
           ]
         },
         {
-          title: '网络与浏览器',
+          title: '浏览器',
           collapsable: true,
           children: [
-            '/networkAngBrowser/http-network/',
-            '/networkAngBrowser/HTTP/',
-            '/networkAngBrowser/https/',
-            '/networkAngBrowser/http-tcp/',
-            '/networkAngBrowser/http-dns/',
-            '/networkAngBrowser/browserCaching/',
-            '/networkAngBrowser/garbageCollection/',
-            '/networkAngBrowser/MemoryLeak/',
-            '/networkAngBrowser/safety/',
-            '/networkAngBrowser/cross-domain/',
-            '/networkAngBrowser/http-message/'
+            '/Browser/Operation/',
+            '/Browser/Caching/',
+            '/Browser/garbageCollection/',
+            '/Browser/MemoryLeak/',
+            '/Browser/safety/',
+            '/Browser/cross-domain/'
           ]
         },
         {
@@ -135,14 +142,6 @@ module.exports = {
             "/css/Grid/",
             "/css/CSS3Animation/",
             "/css/css-basics/"
-          ]
-        },
-        {
-          title:'网络',
-          collapsable: true,
-          children: [
-            "/Network/OSI&TCP/",
-            "/Network/TCP&UDP/"
           ]
         },
         {
