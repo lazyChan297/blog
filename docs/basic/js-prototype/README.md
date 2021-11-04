@@ -40,6 +40,12 @@ f.a()
 
 所以 `c1.__proto__.__proto__`指向了`P`的原型对象，实现原型链继承
 
+**`instanceof`关键字判断的是左边值的__proto__是指向右边值的prototype中，如果不是指向右边的值的prototype则会继续寻找右边值的prototype的__proto__**
+- `Object instanceof Object` 等于`true`
+  - 因为Object本身是一个函数所以`Object.__proto__ === Function.prototype // true` 
+  - 而函数的原型对象的隐式原型又指向`Object.prototype`，`Function.prototype.__proto__ === Object.prototype//true`
+- `Function instanceof Function`等于`true`，因为`Function.__proto__ === Function.prototype`等于true
+- `Function instanceof Object`，因为`Function.prototype.__proto__ === Object.prototype`等于true
 ## 继承
 ### ES5实现继承
 
