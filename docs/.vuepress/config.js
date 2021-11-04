@@ -75,23 +75,7 @@ module.exports = {
             "/analysis/vue2-array-reactive/"
           ]
         },
-        {
-          title: 'React',
-          collapsable: true,
-          children: [
-            "/react/redux/"
-          ]
-        },
-        {
-          title: 'React-native',
-          collapsable: true,
-          children: [
-            "/react-native/rn-mfe/",
-            "/react-native/rn-communication/",
-            "/react-native/rn-frameDrop/",
-            "/react-native/rn-preload/"
-          ]
-        },
+        
         {
           title:'网络',
           collapsable: true,
@@ -133,7 +117,6 @@ module.exports = {
             '/engineering/RouterLazyLoading/'
           ]
         },
-        
         {
           title: 'CSS',
           collapsable: true,
@@ -145,12 +128,30 @@ module.exports = {
           ]
         },
         {
-          title: '数据结构与算法',
+          title: '算法',
           collapsable: true,
           children: [
             "/algorithm/sorting/",
             "/algorithm/binaryTree/",
-            "/algorithm/linkedList/"
+            "/algorithm/linkedList/",
+            "/algorithm/String/"
+          ]
+        },
+        {
+          title: 'React',
+          collapsable: true,
+          children: [
+            "/react/redux/"
+          ]
+        },
+        {
+          title: 'React-native',
+          collapsable: true,
+          children: [
+            "/react-native/rn-mfe/",
+            "/react-native/rn-communication/",
+            "/react-native/rn-frameDrop/",
+            "/react-native/rn-preload/"
           ]
         }
       ],
