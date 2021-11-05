@@ -7,6 +7,7 @@ function longestCommonPrefix( strs ) {
     if (strs.length === 1) return strs[0]
     // 返回值默认为空
     let res = ''
+    strs.sort()
     // 对字符串数组排序，排列的结果按照字典序排列，所以只需要用第一个和最后一个比较
     let first = strs[0], last = strs[strs.length-1]
     for (let i = 0; i < first.length; i++) {
@@ -41,6 +42,28 @@ function LCS(str1 ,  str2) {
 }
 ```
 
+## 判断回文
+找到字符串中间索引为中心，定义左右两枚指针，向两边扩散。字符串长度为奇数时，左右指针都是中间值索引；偶数时左指针为中间值-1，右指针为中间值
+```javascript
+function judge( str ) {
+    // write code here
+    if (!str.length) return true
+    let len = str.length
+    let isOdd = len % 2 === 0 ? false : true
+    let mid = Math.floor(len/2)
+    let left = isOdd ? mid : mid - 1
+    let right = isOdd ? mid : mid
+    while(left >= 0 && right < len) {
+        if (str.charAt(left) === str.charAt(right)) {
+            left--
+            right++
+        } else {
+            return false
+        }
+    }
+    return true
+}
+```
 ## 最长回文子串
 对于一个字符串（仅包含小写英文字母），请设计一个高效算法，计算其中最长回文子串的长度。
 ```javascript
@@ -97,5 +120,25 @@ function topKstrings(strings, k) {
     // 按出现次数降序排序
     res.sort((a,b) => b[1]-a[1])
     return res.slice(0, k)
+}
+```
+
+## 字符串转换为整数
+1. 去掉无用的前导空格
+2. 第一个非空字符为+或者-号时，作为该整数的正负号，如果没有符号，默认为正数
+3. 判断整数的有效部分：
+    - 确定符号位之后，与之后面尽可能多的连续数字组合起来成为有效整数数字，如果没有有效的整数部分，那么直接返回0
+    - 将字符串前面的整数部分取出，后面可能会存在存在多余的字符(字母，符号，空格等)，这些字符可以被忽略，它们对于函数不应该造成影响
+    - 整数超过 32 位有符号整数范围 [−231,  231 − 1] ，需要截断这个整数，使其保持在这个范围内。具体来说，小于 −231的整数应该被调整为 −231 ，大于 231 − 1 的整数应该被调整为 231 − 1
+4. 去掉无用的后导空格
+```javascript
+function StrToInt( s ) {
+    if (!s) return 0
+    // 使用正则表达式匹配+-数字开头部分
+    let strArr = s.trim().match(/^[+-]?\d+/)
+    if (!strArr) return 0
+    if (strArr[0] >= Math.pow(2,31)) return Math.pow(2, 31) -1
+    if (strArr[0] <= Math.pow(-2,31)) return Math.pow(-2, 31)
+    return strArr[0]
 }
 ```

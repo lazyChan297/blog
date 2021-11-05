@@ -162,10 +162,30 @@ function reBuild(pre, vin) {
 ## 求出二叉树最大深度
 ```javascript
 function maxDepth(root) {
-    if (root === null) return 0
+    if (!root) return 0
     let left = maxDepth(root.left)
     let right = maxDepth(root.right)
     return Math.max(left, right) + 1
+}
+```
+
+## 求出二叉树的最小深度
+```javascript
+function minDepth(root) {
+    if (!root) return 0
+    let depth = 1
+    let queue = [root]
+    while(queue.length) {
+        let size = queue.length
+        for (let i = 0; i < size; i++) {
+            let node = queue.pop()
+            if (!node.left && !node.right) return depth
+            queue.push(node.left)
+            queue.push(node.right)
+            depth++
+        }
+    }
+    return depth
 }
 ```
 
