@@ -1,19 +1,21 @@
-# nextTick和批量异步更新策略
+# NextTick和批量异步更新策略
+
 
 ## nextTick
 nextTick是一个实现函数批量异步执行的工具函数。
 
 ### 实现原理
-nextTick会把你想要在下一次事件循环中才执行的函数推入一个callbacks数组中，<br/>
-然后检查有没有注册了`flushCallbacks（遍历执行callbacks函数数组的任务）`在异步任务队列中，<br/>
-如果有，则`pending`为`true`，不允许再注册<br/>
-使用这个开关的目的是为了防止重复注册到异步任务中。<br/>
-如果当前开关是关闭的，那么不允许再注册`flushCallbacks`函数到异步任务队列中<br/>
-`timerFunc`的方法实现了注册`flushCallbacks`到异步任务队列中<br/>
-本质是利用`Promise.then()`，把`flushCallbacks`添加到then回调中，
-如果浏览器不支持就降级使用`MutationObserver`or`setTimeout`实现异步回调。
-当同步任务执行完毕，flushCallback开始执行时才能把开关打开，允许注册下一轮的批量异步执行函数，并把callbacks数组清空。
-
+1. `nextTick(cb)`会把需要异步执行的函数添加到一个全局对象`callbacks`数组中
+2. 判断`pending`的值，当前是否有负责批量执行异步函数的`flushCallbacks`函数注册到异步任务中
+  - `pending`为`true`，表示已经有批量执行异步函数任务注册
+  - `pending`为`false`，表示没有
+3. 通过`timerFunc`把`flushCallbacks`函数注册到异步任务中；通过以下几种方法之一实现
+  - 当前环境支持`Promise`，`timerFunc`赋值为`Promise.resolve()`把`flushCallbacks`回调放到`then`回调中
+  - 当前环境支持`new MutationObserver()`
+  - 当前环境支持`setImmediate`,把`timerFunc`赋值为匿名函数，函数体内把`flushCallbacks`作为参数传入`setImmediate`中
+  - 当前环境支持`setTimeout`，赋值方式和`setImmediate`大体相同
+4. 调用`timerFunc`把`flushCallbacks`注册到异步任务队列中
+5. 异步任务开始执行，`flushCallbacks`把callbacks数组拷贝然后遍历该数组执行，同时把callbacks数组清空，将`pending`状态更新为`false`，允许注册下一轮nextTick函数
 
 
 **一些变量和函数说明**
@@ -107,6 +109,17 @@ export function nextTick (cb?: Function, ctx?: Object) {
 
 ## 批量异步更新策略
 实现原理是基于`nextTick`的功能，批量的把观察者实例们的更新操作都注册到异步队列中，<br/>
+
+1. 组件更新，观察者实例执行`update`方法，如果是异步组件会进入调用`queueWatcher`函数
+2. `queueWatcher`判断当前是否有观察者队列在执行更新回调，根据`flushing`字段
+  - `flushing`为`true`，直接将当前观察者推入队列的末尾
+  - `flushing`为`false`，根据当前观察者的id插入到对应的位置（按id从小到大排列），使队列上的观察者函数有序更新
+3. 通过`waiting`字段判断是否有`flushSchedulerQueue`函数注册到异步任务队列（nextTick的callbacks数组中）
+  - `waiting`为`true`，表示已经注册过
+  - `waiting`为`false`，调用`nextTick(flushSchedulerQueue)`将`flushSchedulerQueue`添加到异步更新队列中
+4. 当`flushSchedulerQueue`函数开始执行，把queue的观察者函数按照id进行从小到大排列，因为更新是从父-子，打开flushing开关，设置为true。该函数遍历队列上的
+观察者函数执行，调用`watcher.run()`，`run`方法函数内又调用了`watcher.get()`方法，也就是此时才会去访问响应式对象的值获取最新的值，使视图更新
+5. 执行完毕后，把`flushing`和`waiting`状态都改为false，并把queue队列清空
 
 
 **vue中数据的更新是批量异步更新是怎么理解的？为什么要这样做？**<br/>

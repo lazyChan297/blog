@@ -1,4 +1,4 @@
-# async await
+# Async异步函数
 
 ## async
 异步处理函数，`generator`函数的语法糖
@@ -46,12 +46,13 @@ await用来执行需要异步处理的函数，await命令后的代码会被注�
 ### 不要在forEach中使用async await
 因为`forEach`的回调函数会变为普通函数
 
-### 与generator的区别
+### 与Generator的区别
 generator函数必须通过任务执行器（可以理解为generator函数的返回值）调用执行，<br/>
 或者遍历generator调用执行，而async可以自动执行
 
 ### 与Promise的区别
-在代码结构上，`async`会比`promise`函数更加清晰
+1. 在代码结构上，`async`会比`promise`函数更加清晰
+2. 处理并发请求的时候Promise有很多种方法支持，例如`race`&`all`&`allSettled`，async没有专门的方法处理
 
 ## async实现原理
 async的generator的语法糖，区别只在于async可以自动执行，<br/>
@@ -59,6 +60,10 @@ async的generator的语法糖，区别只在于async可以自动执行，<br/>
 所以只需要实现一个generator的自动执行器，<br/>
 就可以实现`async`
 
+**async函数的返回值是调用了自动执行器函数spawn，把包裹了async函数体的generator函数作为参数传入，spawn执行后会返回一个promise对象，promise对象的构造函数中会做三件事**
+1. 执行传入的函数参数也就是generator，返回返回一个generator函数遍历器gen
+2. 创建分步函数step。step接收一个函数作为参数，然后调用函数的next方法，同时用next变量保存执行结果。接着判断next.done是否为true，如果是就会执行resolve方法，把返回的promise对象状态变为fulfilled，使async函数的返回值then回调得以执行；如果不为true，会把next.value包装成一个promise.resolve对象，在该对象的then回调中递归调用分步函数，传入的参数是一个匿名函数，函数体内执行函数遍历器的next方法
+3. 定义好gen函数遍历器和分步函数后，会调用分步函数，传入的值是一个匿名函数，函数体指向`gen.next(undefined)`，next方法的传参是代替上一次调用`yield`命令返回的结果，因为是第一次调用，所以传入undefined。
 ### 自动执行器的实现思路
 1. 返回一个promise对象，因为`async`函数的返回值就是promise对象
 ```javascript

@@ -104,17 +104,22 @@ depend () {
 观察者实例watcher的addDep会把参数里的dep添加到`watcher.deps`中，同时把自身添加到dep的subs中，<br/>
 这样，**响应式对象的dep的subs中包含了computed属性，computed属性的deps中包含了响应式对象的dep**
 ```JavaScript
-addDep(dep) {
-    // 此处做了去重优化
+addDep (dep: Dep) {
+    const id = dep.id
     if (!this.newDepIds.has(id)) {
-        this.newDepIds.add(id)
-        this.newDeps.push(dep) // 把响应式对象a的dep添加到计算属性watcher.deps中
-        if (!this.depIds.has(id)) {
-            // 把计算属性watcher添加到响应式对象a的subs中
-            dep.addSub(this)
-        }
+      this.newDepIds.add(id)
+      this.newDeps.push(dep)
+      if (!this.depIds.has(id)) {
+        dep.addSub(this)
+      }
     }
 }
+depend () {
+    let i = this.deps.length
+    while (i--) {
+      this.deps[i].depend()
+    }
+  }
 ```
 求值结束后把`Dep.target`归还给上一个观察者实例，也就是访问computed的观察者实例watcher对象
 
