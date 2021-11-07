@@ -136,7 +136,8 @@ module.exports = {
             "/algorithm/linkedList/",
             "/algorithm/String/",
             "/algorithm/Math/",
-            "/algorithm/Array&Matrix/"
+            "/algorithm/Array&Matrix/",
+            "/algorithm/DP/"
           ]
         },
         {
