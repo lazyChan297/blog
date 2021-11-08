@@ -208,6 +208,49 @@ function sortInList( head ) {
     return head
 }
 ```
+
+## 重排链表
+将给定的单链表 `L0->L1-L2-L3` 重排后 `L0-Ln-0->L1->Ln-1`
+1. 根据快慢指针找到链表的中点，快针每次移动两步，慢针一步，从中点分割链表；
+    - 链表长度是偶数时快针走到倒数第二个节点时慢针指向链表前半段的最后一个节点
+    - 链表长度是奇数时快针走到倒数第一个节点时慢针指向链表前半段的最后一个节点
+2. 为链表后半段head创建一个新变量赋值为slow.next，同时把slow.next置空，断开与后半段的连接
+3. 反转后半段连接
+4. 遍历后半段链表与前半段拼接
+```javascript
+function reorderList( head ) {
+    if (!head || !head.next) return null
+    // 根据快慢指针找到链表的中点，快针每次移动两步，慢针一步，从中点分割链表；
+    let slow = head, fast = head
+    while(fast.next && fast.next.next) {
+        fast = fast.next.next
+        slow = slow.next
+    }
+    // 为链表后半段head创建一个新变量赋值为slow.next，同时把slow.next置空，断开与后半段的连接
+    let newHead = slow.next
+    slow.next = null
+    newHead = reverse(newHead)
+    while(newHead) {
+        let temp = newHead.next
+        newHead.next = head.next
+        head.next = newHead
+        head = newHead.next
+        newHead = temp
+    }
+    return head
+}
+function reverse(head) {
+    let prev = null, cur = head
+    while(cur) {
+        let temp = cur.next
+        cur.next = prev
+        prev = cur
+        cur = temp
+    }
+    return prev
+}
+```
+ 
 ## 合并两个排序的链表
 `创建一个head作为合并后链表的head，一个current指针指向新链表当前节点，随后遍历两个链表比较它们当前节点的值，较小的值添加到新链表中，current.next等于较小的值，然后更新新链表的指针，current更新为current.next`
 ```javascript
