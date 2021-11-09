@@ -137,7 +137,8 @@ module.exports = {
             "/algorithm/String/",
             "/algorithm/Math/",
             "/algorithm/Array&Matrix/",
-            "/algorithm/DP/"
+            "/algorithm/DP/",
+            "/algorithm/Stack/"
           ]
         },
         {
