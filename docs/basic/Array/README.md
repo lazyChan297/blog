@@ -40,6 +40,16 @@
 如果是稀疏数组不会对不存在的元素执行回调函数
 
 ## 常用的数组处理方法
+
+### 实现map方法
+```javascript
+Array.prototype.myMap = function(f, that) {
+  return this.reduce((acc, cur, idx) => {
+    acc[idx] = f.call(that, cur, idx, this);
+    return acc;
+  }, []);
+}
+```
 ### 去重
 ```javascript
 function uniqueByReduce(array) {
