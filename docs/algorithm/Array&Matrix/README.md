@@ -205,6 +205,28 @@ function merge( intervals ) {
 }
 ```
 
+### 最长无重复子数组
+比如`[1,3,5,7,9]`的子数组有[1,3]，[3,5,7]等等，但是[1,3,7]不是子数组
+```JavaScript
+function maxLength( arr ) {
+    // key:数组中的元素，value：出现过的索引
+    let map = new Map()
+    // 当出现重复数字时，j指向它上一次出现的索引值
+    let i = -1
+    // 最长子数组长度
+    let maxLength = 0
+    for (let j = 0; j < arr.length; j++) {
+        if (map.has(arr[j])) {
+            i = Math.max(i, map.get(arr[j]))
+        }
+        maxLength = Math.max(maxLength, j-i)
+        // 更新元素出现的位置
+        map.set(arr[j], j)
+    }
+    return maxLength
+}
+```
+
 ## Matrix
 
 ### 螺旋矩阵打印
