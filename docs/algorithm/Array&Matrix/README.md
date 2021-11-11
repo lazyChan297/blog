@@ -55,6 +55,45 @@ function mp(arr) {
 }
 ```
 
+### 寻找第K大
+直接用快排解决
+```JavaScript
+function findKth( a ,  n ,  K ) {
+    // write code here
+    function divide(arr, l, r) {
+        let mid = arr[Math.floor((r+l)/2)]
+        let i = l, j = r
+        while(i <= j) {
+            while(mid > arr[i]) {
+                i++
+            }
+            while(mid < arr[j]) {
+                j--
+            }
+            if (i <= j) {
+                [arr[i], arr[j]] = [arr[j], arr[i]]
+                i++
+                j--
+            }
+        }
+        return i
+    }
+    function quickSort(arr, l,r) {
+        if (arr.length > 1) {
+            let index = divide(arr, l ,r)
+            if (l < index-1) {
+                quickSort(arr,l,index-1)
+            }
+            if (index < r) {
+                quickSort(arr,index,r)
+            }
+        }
+    }
+    quickSort(a,0,n-1)
+    return a[n-K]
+}
+```
+
 ### 旋转数组
 在空间复杂度O(1)的前提下，使用环状替换的方法旋转。
 - 总共遍历a圈，每圈长度是n，每圈遍历b个元素，每个元素移动k步，a*n = k*b，当一圈结束后就要开始下一次遍历所以a要尽可能小，所以a*n是n和k的最小公倍数

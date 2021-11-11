@@ -56,3 +56,72 @@ function minMoney( arr ,  aim ) {
     return dp[aim] === aim + 1 ? -1 : dp[aim]
 }
 ```
+
+## 最长递增子序列长度
+```javascript
+function LIS(arr) {
+    let res = [arr[0]]
+    for (let i = 1; i < arr.length; i++) {
+        if (arr[i] > res[res.length-1]) {
+            res.push(arr[i])
+        } else {
+            let l = 0, r = res.length-1
+            while(l<=r) {
+                let mid = Math.floor((r+l)/2)
+                if (res[mid] > arr[i]) {
+                    r = mid-1
+                } else if(res[mid] < arr[i]) {
+                    l = mid+1
+                } else {
+                    l = r
+                    break
+                }
+            }
+            res[l] = arr[i]
+        }
+    }
+    return res.length
+}
+```
+
+## 最长递增子序列
+```javascript
+function LIS( arr ) {
+    // write code here
+    if (!arr.length) return []
+    let res = [arr[0]]
+    let dp = new Array(arr.length).fill(1)
+    for (let i = 1; i < arr.length; i++) {
+        if (arr[i] > res[res.length-1]) {
+            res.push(arr[i])
+            dp[i] = res.length
+        } else {
+            let left = 0, right = res.length-1
+            while(left <= right) {
+                let mid = Math.floor((right+left)/2)
+                if (res[mid] > arr[i]) {
+                    right = mid-1
+                } else if (res[mid] < arr[i]) {
+                    left = mid + 1
+                } else {
+                    left = right
+                    break
+                }
+            }
+            res[left] = arr[i]
+            dp[i] = left+1
+        }
+    }
+    let resLen = res.length
+    let index = dp.length - 1
+    let result = []
+    while(resLen > 0) {
+        if (dp[index] === resLen) {
+            result.unshift(arr[index])
+            resLen--
+        }
+        index--
+    }
+    return result
+}}
+```
