@@ -266,6 +266,37 @@ function maxLength( arr ) {
 }
 ```
 
+### NC46 加起来和为目标值的组合
+给出一组候选数 c 和一个目标数 t ，找出候选数中起来和等于 t 的所有组合。
+输入`[100,10,20,70,60,10,50],80`，输出`[[10,10,60],[10,20,50],[10,70],[20,60]]`
+```JavaScript
+function combinationSum2( num ,  target ) {
+    num.sort((a,b) => a-b)
+    let tempArr = []
+    let res = []
+    dfs(num, target, 0, tempArr, res, 0)
+    return res
+}
+function dfs(num, target, temp, tempArr, res, start) {
+    if (temp === target) {
+        let newTemp = [...tempArr]
+        res.push(newTemp)
+        return
+    }
+    if (start > num.length) return
+    for (let i = start; i < num.length; i++) {
+        if (i > start && num[i] === num[i-1]) continue
+        let n = num[i]
+        if ((temp+n) <= target) {
+            temp += n
+            tempArr.push(n)
+            dfs(num, target, temp, tempArr, res, i+1)
+            tempArr.pop()
+            temp = temp - n
+        }
+    }
+}
+```
 ## Matrix
 
 ### 螺旋矩阵打印
