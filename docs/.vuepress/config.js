@@ -69,6 +69,7 @@ module.exports = {
             "/analysis/vue-lifecycle/",
             "/analysis/vue-nexttick/",
             "/analysis/vue-keepalive/",
+            "/analysis/v3-diff/",
             "/analysis/vue-diff/",
             "/analysis/vue-computed/",
             "/analysis/vue-set/",
@@ -104,7 +105,8 @@ module.exports = {
             '/Browser/garbageCollection/',
             '/Browser/MemoryLeak/',
             '/Browser/safety/',
-            '/Browser/cross-domain/'
+            '/Browser/cross-domain/',
+            '/Browser/WhiteScreen/'
           ]
         },
         {
