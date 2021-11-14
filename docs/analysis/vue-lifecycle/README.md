@@ -1,10 +1,10 @@
 # 生命周期
 
-## 首次渲染
-1. `_init()`函数：初始化生命周期函数，事件，渲染函数
-2. 调用`beforeCreate`钩子：初始化injection，state，provide
-- 调用`created`钩子
-3. 执行`mountComponent`函数，创建updateComponent函数作为组件更新时调用，负责为组件创建观察者实例，然后返回当前组件实例
+## 初始化
+- `_init()`函数：初始化生命周期函数，事件，渲染函数
+- 调用`beforeCreate`钩子：初始化injection，state，provide
+  - 调用`created`钩子
+- 执行`mountComponent`函数，创建updateComponent函数作为组件更新时调用，负责为组件创建观察者实例，然后返回当前组件实例
 如果没有定义`render`函数，会给当前实例的render赋值为一个创建空节点的函数`createEmptyVNode`，`createEmptyVNode`函数会创建一个空的`new VNode()`对象返回
   - 执行`beforeMount`勾子函数
   - 创建一个`updateComponent`函数
@@ -19,11 +19,8 @@
 3. 当事件循环到异步任务执行，响应式对象的执行它的`updateComponent()`方法，该方法调用了`_vm.render()`，访问到了最新的响应式属性值，返回新的`VNode`对象。接着调用`vm._update(node)`方法，对比新旧虚拟dom的差异，最终通过差异定位要更新的视图内容，实现更新
 
 
-## 组件销毁流程的生命周期
-
-首先执行**beforeDestroy**
-
-如果组件存在parent则清除父子关系
-
-移除组件的watcher和订阅者
-执行**destroyed**
+## 组件销毁
+1. 执行**beforeDestroy**
+2. 如果组件存在parent则清除父子关系
+3. 移除组件的watcher和订阅者
+4. 执行**destroyed**
