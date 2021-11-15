@@ -125,3 +125,28 @@ function LIS( arr ) {
     return result
 }}
 ```
+
+## 最长公共子序列
+给定两个字符串，`"1A2C3D4B56","B1D23A456A"`，那么它们的最长公共子序列就是`123456`
+```JavaScript
+function LCS(s1: string, s2: string): string {
+    if (s1.length > s2.length) [s1, s2] = [s2, s1]
+    // 给每一个位置的字符串默认的公共子序列值是空字符串
+    let dp = new Array(s2.length+1).fill('')
+    // 从较短的字符串遍历，逐个字符与较长的字符串比较，如果相等则dp[j]就是前一个相等的值+当前相等的值，否则dp[j]的值和上一个相等
+    for (let i = 1; i <= s1.length; i++) {
+        let prev = ''
+        for (let j = 1; j <= s2.length; j++) {
+            let temp = dp[j]
+            if (s1[i-1] === s2[j-1]) {
+                dp[j] = prev + s2[j-1]
+            } else {
+                dp[j] = dp[j].length > dp[j-1].length ? dp[j] : dp[j-1]
+            }
+            prev = temp
+        }
+    }
+    return dp[dp.length-1] === '' ? -1 : dp[dp.length-1]
+}
+
+```
