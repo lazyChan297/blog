@@ -3,7 +3,7 @@ webpack能够处理模块的加载顺序、模块之间的依赖关系、将各�
 
 ## 构建流程
 **初始化** 
-- 从`shell语句中的参数`和`配置文件`中读取、合并配置参数得到`options`对象，该对象包含了入口/出口文件名和路径配置，plugins集合，module的转换规则，然后传入`options`作为参数，创建一个webpack实例`complier`，该实例负责注册webpack的生命周期`编译前/编译中/编译后`等等
+- 从`shell语句中的参数`和`配置文件`中读取、合并配置参数得到`options`对象，该对象包含了入口/出口文件名和路径配置，plugins集合，module的转换规则，然后传入`options`作为参数，创建一个**编译器**(webpack实例`complier`)，`编译器`调用插件的`apply`方法，在插件需要调用的生命周期勾子函数中注册插件函数执行
 
 **编译**
 - `compile`执行`run`方法，正式开始编译，该方法会触发compile方法返回一个Complication对象，该对象负责组织整个构建环节的流程，包含了构建和输出文件所对应的方法，同时保存了所有module和chunk，生成的asset
@@ -17,10 +17,13 @@ webpack能够处理模块的加载顺序、模块之间的依赖关系、将各�
 - 调用acorn把loader返回的js代码解析成ast对象
 - 遍历ast对象，遇到依赖其他模块时递归，重复创建模块的步骤，直到理清当前模块的依赖关系
 
-**seal** 
-该方法负责给每一个chunk绑定对应的module，一个chunk由一个或多个module组成。创建一个`chunk`对象，调用该对象的addModule方法添加模块
+**封装** 
 
-**输出文件** 确定了chunk和module之间的绑定关系后调用`createChunkAssets`方法最终生成asset，该方法会把构建模块中的ast对象分析，最终得到可以在浏览器运行的代码输出到dist中
+`seal`方法负责给每一个chunk绑定对应的module，一个chunk由一个或多个module组成，封装后得到一个个`chunk`对象，`chunk`里面包含了`module`中依赖的所有`module`
+
+**输出文件** 
+
+确定了chunk和module之间的绑定关系后调用`createChunkAssets`方法最终生成asset，该方法会把构建模块中的ast对象分析，最终得到可以在浏览器运行的代码输出到dist中
 
 ## Loader
 webpack默认只能打包js或json文件，对于其它资源需要通过`Loader`对内容进行翻译使webpack支持
@@ -41,7 +44,7 @@ webpack默认只能打包js或json文件，对于其它资源需要通过`Loader
 ## Plugins
 丰富打包的功能，例如压缩，合并，体积分析，打包计时分析
 
-**执行时机** 贯穿整个构建流程的生命周期，由webpack实例`complier`触发响应的勾子执行
+**执行时机** 贯穿整个构建流程的生命周期，由webpack实例`complier`触发对应的生命周期执行
 
 ### 常用plugins
 - html-webpack-plugin 创建html文件，由`new HtmlWebpackPlugin()`创建实例返回
@@ -58,7 +61,7 @@ new compressionWebpackConfig({
 })
 ```
 - copy-webpack-plugin 将工程中的文件复制到dist目录下，例如favicon.ico
-## 热更新
+## 热更新原理
 1. `webpack-dev-server`启动一个本地服务器并和浏览器之间建立了socket通信，保持长连接
 2. webpack发送给浏览器两个文件，一个是代码打包后的js文件，以hash值命名；一个是json文件 {c: 文件路径,h: hash值}
 3. 当webpack监听到文件变化后重新向浏览器发送更新了hash值的json文件和新的打包文件
@@ -81,5 +84,31 @@ new compressionWebpackConfig({
 then回调函数是`__webpack_require__.bind(null, moduleId)`，该方法创建一个module对象，i的值是moduleId，exports属性是路由懒加载文件的js源代码，并把该module对象添加到全局的installedModules对象中，最后返回module.exports，路由懒加载完成
 [路由懒加载详细源码](/engineering/RouterLazyLoading/)
 
+## 优化
+记录一些在项目中在`webpack`层面做的优化
+- 升级了vue-cli版本到3和webpack版本到4
+    - `vue-cli3`默认使用了`hashedModuleIdsPlugin`和`NamedChunksPlugin`解决了增加一个模块使它后面的moduleId和chunkName也被改变导致乱序，缓存失效的问题
+    - `webpack4`提供了默认的拆包的能力，更好的利用缓存持久化
+- 减少http网络请求
+    - 将小于100kb的图片使用`url-loader`转换成`base64`格式文件
+    - 对运行时文件`runtime`使用内联引入，因为该文件体积较小且变动频繁
+- 提高页面渲染速度，
+    - 因为项目是管理后台且页面较多没有明确的下一个会打开的页面且固定哪一个频率较高，所选择关闭`vue-cli3`默认开启的预加载，减少不必要的带宽浪费
+    - 同时使用了`script-ext-html-webpack-plugin`对html文件中文件加载的方式进行修改
+        - `app.css`和`chunk-libs.css`开启预加载
+        - `app.js`和`chunk-libs.js`开启async异步加载
+- 体积优化
+    - 将js和css压缩成`gzip`格式，`nginx`配置支持`gzip`格式解码
+- 构建效率优化
+    - `babel-loader`只对`src`下的开发代码编译
+- 缓存持久化
+    - 开启`config.optimization.runtimeChunk('single')`，使入口文件`app.js`构建后的文件名不随着异步加载的组件更新而更新
+- 拆包
+    - 将项目中引入的`element-ui`打包成一个独立的js文件，因为它体积较大引入（最小的压缩后也有200多kb）且变更频率较低，结合缓存持久化将它拆分成一个独立的文件
+    - 将来自于`node_modules`的文件打包成独立的js文件
+    - 将很多页面都使用的公共组件打包到一个公共的js文件`chunk-common.js`
+    - 业务组件全部使用懒加载
+
 ## 参考
 1. [细说webpack之流程篇](https://developer.aliyun.com/article/61047)
+2. [webpack4拆包相关](https://segmentfault.com/a/1190000015919928)
