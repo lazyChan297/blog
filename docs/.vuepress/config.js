@@ -32,6 +32,7 @@ module.exports = {
                 "/basic/js-new/",
                 "/basic/call&apply&bind/",
                 "/basic/js-prototype/",
+                "/basic/String/",
                 "/basic/Array/",
                 "/basic/RegExp/",
                 "/basic/js-curry/",

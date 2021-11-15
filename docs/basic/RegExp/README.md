@@ -167,7 +167,7 @@ function findCharMax(string) {
 - `'aaabba' -> 'a3b2a'`
 ```JavaScript
 function findCharMax(string) {
-    // 1*表示与前面的小括号的匹配项内容相同
+    // \1表示与前面的小括号的匹配项内容相同，*表示0次或更多次
     let reg = /(\w)\1*/g
     // 返回一个以相同字符串为1个元素的数组
     let charArr = string.match(reg)
