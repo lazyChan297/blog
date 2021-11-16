@@ -293,4 +293,50 @@ function lowestCommonAncestor( root ,  o1 ,  o2 ) {
 }
 ```
 
+## 给定一个升序排序的数组，将其转化为平衡二叉搜索树（BST）
+平衡二叉搜索树指树上每个节点 node 都满足左子树中所有节点的的值都小于 node 的值，右子树中所有节点的值都大于 node 的值，并且左右子树的节点数量之差不大于1
+使用二分的方式分割数组，构建二叉树
+```javascript
+function TreeNode(x) {
+   this.val = x;
+   this.left = null;
+   this.right = null;
+}
+function sortedArrayToBST(num) {
+    let mid = Math.floor(num.length/2)
+    let root = new TreeNode(num[mid])
+    root.left = sortedArrayToBST(num.slice(0,mid))
+    root.right = sortedArrayToBST(num.slice(mid+1, num.length))
+    return root
+}
+```
 
+## 找到搜索二叉树中两个错误的节点
+一棵二叉树原本是搜索二叉树，但是其中有两个节点调换了位置，使得这棵二叉树不再是搜索二叉树，请按升序输出这两个错误节点的值。(每个节点的值各不相同)
+搜索二叉树：满足每个节点的左子节点小于当前节点，右子节点大于当前节点。
+将搜索二叉树中序遍历可以得到升序数组，从前往后遍历找到第一个不是升序的元素，从后往前遍历找到第一个不是降序的元素
+```javascript
+function inOrder(root, arr) {
+    inOrder(root.left)
+    arr.push(root.val)
+    inOrder(root.right)
+}
+function findError( root ) {
+    let res = []
+    let arr = []
+    inOrder(root, arr)
+    // 往后搜索，找到不是升序的
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] > arr[i+1]) {
+            res.push(arr[i])
+        }
+    }
+    // 往前搜索，找到不是降序的
+    for (let i = arr.length-1; i >= 0; i--) {
+        if (arr[i] < arr[i-1])
+            res.push(arr[i])
+    }
+     
+    return [Math.min(...res), Math.max(...res)]
+}
+```

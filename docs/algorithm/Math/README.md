@@ -173,3 +173,29 @@ function isPalindrome( x ) {
     return x === res || x === Math.floor(res/10)
 }
 ```
+
+## 二进制中1的个数
+给出一个十进制数`10`，转换为二进制数后是`1010`，那么1的个数就为2
+使用按位或操作符`&`，`n & (n-1)`可以从右到左剔除掉`1`的，剔除的次数就是`1`的个数
+```JavaScript
+function NumberOf1(n) {
+    // 1出现的个数
+    let res = 0
+    while(n) {
+        res++
+        n = n & (n-1)
+    }
+    return res
+}
+```
+
+## 3个数的最大乘积
+```javascript
+function solve( A ) {
+    let len = A.length-1
+    A.sort((a,b) => a-b)
+    let m1 = A[0] * A[1] * A[len]
+    let m2 = A[len-1] * A[len-2] * A[len]
+    return Math.max(m1,m2)
+}
+```

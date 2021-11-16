@@ -297,6 +297,24 @@ function dfs(num, target, temp, tempArr, res, start) {
     }
 }
 ```
+
+### 调整数组顺序使奇数位于偶数前面(一)
+```javascript
+function reOrderArray( array ) {
+    // 记录奇数的索引
+    let i = 0
+    for (let j = 0; j < array.length;++j) {
+        if (array[j] % 2 === 1) {
+            let temp = array[j]
+            for (let k = j-1; k >= i; --k) {
+                array[k+1] = array[k]
+            }
+            array[i++] = temp
+        }
+    } 
+    return array
+}
+```
 ## Matrix
 
 ### 螺旋矩阵打印
