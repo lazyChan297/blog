@@ -95,6 +95,20 @@ function palindrome(left, right, string, n) {
 }
 ```
 
+## 旋转字符串
+给定两字符串A和B，如果能将A从中间某个位置分割为左右两部分字符串（可以为空串），并将左边的字符串移动到右边字符串后面组成新的字符串可以变为字符串B时返回true
+输入：`"youzan","zanyou"`，输出`true`，`"youzan","zyouan"`，输出`false`
+```javascript
+function solve( A ,  B ) {
+    for (let i = 0; i < A.length; i++) {
+        let s1 = A.substring(0, i)
+        let s2 = A.substring(i, A.length)
+        if (s2 + s1 === B) return true
+    }
+    return false
+}
+```
+
 ## 字符串出现次数的TopK问题
 给定一个字符串数组，再给定整数 k ，请返回出现次数前k名的字符串和对应的次数
 1. 对字符串数组按照字典序排序
@@ -140,5 +154,70 @@ function StrToInt( s ) {
     if (strArr[0] >= Math.pow(2,31)) return Math.pow(2, 31) -1
     if (strArr[0] <= Math.pow(-2,31)) return Math.pow(-2, 31)
     return strArr[0]
+}
+```
+
+## 第一个只出现一次的字符
+```javascript
+function FirstNotRepeatingChar(str)
+{
+    // write code here
+    let res = -1, map = new Map(),strArr = str.split('')
+    for(let i = 0; i < strArr.length;i++) {
+        if (!map.has(strArr[i]) && i === strArr.lastIndexOf(strArr[i])) {
+            res = i
+            break
+        } else {
+            map.set(strArr[i], true)
+        }
+    }
+    return res
+}
+```
+
+## 无重复字符的最长子串
+注意：子串是必须连续的，子序列不是。<br/>
+使用滑动窗口的方式来解决，定义`i`指针为窗口左边界，初始值为`0`，`right`为窗口右边界，初始值为`-1`；使用`set`来保存无重复的子串；<br/>
+如果遇到不是重复的字符，右指针向右移动，直到遇到重复字符，记录本次重复子串长度=`右指针-左指针+1`，与上一个重复子串的长度比较取最大值；
+开启下一轮遍历，左指针向右移动，同时减去滑动窗口最左边的字符来比较
+```javascript
+var lengthOfLongestSubstring = function(s) {
+    let set = new Set()
+    let res = 0
+    let right = -1
+    let n = s.length
+    for (let i = 0; i < n; ++i) {
+        // 不是第0次遍历剔除滑动窗口最左边的值
+        if (i != 0) {
+            set.delete(s.charAt(i-1))
+        }
+        // 遇到无重复字符且右边在合法范围内
+        while(right + 1 < n && !set.has(s.charAt(right+1))) {
+            set.add(s.charAt(right+1))
+            ++right
+        }
+        res = Math.max(res, right - i + 1)
+    }
+    return res
+}
+```
+
+## 字符串的排列
+输入`ab`，输出`[ab,ba]`
+```JavaScript
+function Permutation(str) {
+    // 使用set保存排列后的结果
+    let set = new Set()
+    // 创建一个递归函数
+    let recursive = (prev, str) => {
+        // 当字符串已经拆分结束，将排列的结果保存
+        if (str.length === 0) set.add(prev)
+        for (let i = 0; i < str.length; ++i) {
+            // 将当前字符固定在前，当前字符前面的字符和后面的字符递归判断
+            recursive(prev+str[i], str.slice(0,i).concat(str.slice(i+1)))
+        }
+    }
+    recursive('', str)
+    return Array.from(set)
 }
 ```

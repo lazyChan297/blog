@@ -315,6 +315,40 @@ function reOrderArray( array ) {
     return array
 }
 ```
+
+### 移动0到数组末尾
+```javascript
+function moveZeroes( nums ) {
+    if (!nums || !nums.length) return null
+    // 累计0的个数，用于减去循环次数
+    let zeroNum = 0
+    for (let i = 0; i < nums.length - zeroNum; i++) {
+        if (nums[i] === 0) {
+            nums.push(0)
+            nums.splice(i, 1)
+            i--
+            zeroNum++
+        }
+    }
+    return nums
+}
+```
+
+### 数组中只出现一次的数字
+
+```javascript
+function foundOnceNumber( arr ,  k ) {
+    // write code here
+    arr.sort((a,b) => a-b)
+    for (let i = 0; i < arr.length;) {
+        // 遇到相同的元素直接跳过该元素判断下一个
+        if (arr[i] === arr[i+1]) i = i+k
+        else {
+            return arr[i]
+        }
+    }
+}
+```
 ## Matrix
 
 ### 螺旋矩阵打印

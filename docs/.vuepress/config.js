@@ -141,7 +141,8 @@ module.exports = {
             "/algorithm/Math/",
             "/algorithm/Array&Matrix/",
             "/algorithm/DP/",
-            "/algorithm/Stack/"
+            "/algorithm/Stack/",
+            "/algorithm/KMP/"
           ]
         },
         {

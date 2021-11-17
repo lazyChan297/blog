@@ -58,3 +58,35 @@ function isValid(s) {
 }
 
 ```
+
+## 栈和排序
+```javascript
+function solve( a ) {
+    let stack = []
+    // 保存出栈顺序结果
+    let res = []
+    // 标记元素是否出现过
+    let vis = new Array(a.length).fill(0)
+    // 出栈元素最大值
+    let n = a.length
+    for(let i = 0; i < a.length; ++i) {
+        // 压入
+        stack.push(a[i])
+        // 标记
+        vis[a[i]] = 1
+        // 判断压入栈的元素中有没有大于等于栈顶元素
+        while(n>0&&vis[n] === 1) n--
+        // 让大于n的元素出栈
+        while(stack.length && stack[stack.length-1] >= n) {
+            res.push(stack[stack.length-1])
+            stack.pop()
+        }
+    }
+    // 遍历结束如果还有元素没有出栈，保存原本顺序出栈
+    while(stack.length) {
+        res.push(stack[stack.length-1])
+        stack.pop()
+    }
+    return res
+}
+```

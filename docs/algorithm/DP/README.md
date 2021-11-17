@@ -37,6 +37,36 @@ function maxProfit(prices) {
 }
 ```
 
+## 背包
+已知一个背包最多能容纳体积之和为v的物品，现有 n 个物品，第 i 个物品的体积为 vi , 重量为 wi，求当前背包最多能装多大重量的物品?
+输入`V(背包可容纳体积),n(物品数量),vw(二维数组，[i,j],i是物品体积，j是物品重量`，`10,2,[[1,3],[10,4]]`
+输出`背包可容纳最大重量`，`4`
+```javascript
+function knapsack(V, n, vw) {
+    // 特殊情况判断
+    if (!V || !n || vw.length === 0) return 0
+    // dp[i][j] 选择拿第i件物品，背包重量为j时的重量收益值，默认值为0
+    let dp = Array.from(new Array(n+1), () => new Array(V+1).fill(0))
+    // 遍历物品
+    for (let i = 1; i <= n; i++) {
+        // 遍历体积
+        for (let j = 1; j <= V; j++) {
+            // 当前体积小于要拿起的物品的体积，选择不拿，收益为上一个物品的收益 dp[i][j] = dp[i-1][j]
+            if (j < vw[i-1][0]) {
+                dp[i][j] = dp[i-1][j]
+            } else {
+                // 选择不拿的收益与选择拿的收益比较取最大值
+                let v1 = dp[i-1][j]
+                // 选择拿起的收益等于 上一个可以一起拿起的物品重量收益+当前物品的重量收益
+                let v2 = dp[i-1][j-vw[i-1][0]] + vw[i-1][1]
+                dp[i][j] = Math.max(v1,v2)
+            }
+        }
+    }
+    return dp[n][V]
+}
+```
+
 ## 换钱的最少货币数
 ```javascript
 function minMoney( arr ,  aim ) {

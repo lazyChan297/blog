@@ -189,6 +189,22 @@ function minDepth(root) {
 }
 ```
 
+## 二叉树的直径
+直径指树上任意两个节点的树上距离的最大值，树上距离指节点深度。
+所以只需要找出左右子节点树的最大深度相加，就可以得到二叉树直径
+```javascript
+function diameterOfBinaryTree(root) {
+    if (!root) return 0
+    function dfs(root) {
+        if (!root) return 0
+        let left = dfs(root.left)
+        let right = dfs(root.right)
+        return Math.max(left, right) + 1
+    }
+    return dfs(root.left) + dfs(root.right)
+}
+```
+
 ## 二叉树中和为某一值的路径(一)
 给定一个二叉树root和一个值 sum ，判断是否有从根节点到叶子节点的节点值之和等于 sum 的路径
 ```javascript
@@ -338,5 +354,44 @@ function findError( root ) {
     }
      
     return [Math.min(...res), Math.max(...res)]
+}
+```
+## NC60 判断一棵二叉树是否为搜索二叉树和完全二叉树
+ps：完全二叉树指不是叶子节点的节点同时有左右子节点，遇到不是叶子节点的节点且左右子节点不双全就不是完全二叉树
+```javascript
+function judgeIt(root) {
+    return [bst(root, -Infinity, Infinity), fullTree(root)]
+}
+// 是否搜索二叉树
+function bst(root, min, max) {
+    if (!root) return true
+    if (root.val <= min || root.val >= max) return false
+    return bst(root.left, min, root.val) && bst(root.right, root.val, max)
+}
+// 是否完全二叉树
+function fullTree(root) {
+    if (!root) return true
+    let queue = [root]
+    // 没有左子节点或没有右子节点，flag=false
+    let flag = true
+    while(queue.length) {
+        let len = queue.length
+        for (let i = 0; i < len; i++) {
+            let node = queue.shift()
+            if (node.left) {
+                if (!flag) return false
+                queue.push(node.left)
+            } else {
+                flag = false 
+            }
+            if (node.right) {
+                if (!flag) return false
+                queue.push(node.right)
+            } else {
+                flag = false
+            }
+        }
+    }
+    return true
 }
 ```
