@@ -129,38 +129,6 @@ module.exports = {
             "/css/CSS3Animation/",
             "/css/css-basics/"
           ]
-        },
-        {
-          title: '算法',
-          collapsable: true,
-          children: [
-            "/algorithm/sorting/",
-            "/algorithm/BinaryTree/",
-            "/algorithm/linkedList/",
-            "/algorithm/String/",
-            "/algorithm/Math/",
-            "/algorithm/Array&Matrix/",
-            "/algorithm/DP/",
-            "/algorithm/Stack/",
-            "/algorithm/KMP/"
-          ]
-        },
-        {
-          title: 'React',
-          collapsable: true,
-          children: [
-            "/react/redux/"
-          ]
-        },
-        {
-          title: 'React-native',
-          collapsable: true,
-          children: [
-            "/react-native/rn-mfe/",
-            "/react-native/rn-communication/",
-            "/react-native/rn-frameDrop/",
-            "/react-native/rn-preload/"
-          ]
         }
       ],
       sidebarDepth: 6, // 侧边栏显示2级
