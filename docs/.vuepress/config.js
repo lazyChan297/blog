@@ -23,7 +23,13 @@ module.exports = {
       nav:[ ],
       // 侧边栏配置
       sidebar: [
-        
+        {
+          title: 'git',
+          collapsable: true,
+          children: [
+            "/git/git/"
+          ]
+        },
         {
             title: 'JavaScript', 
             collapsable: true, 
@@ -117,7 +123,8 @@ module.exports = {
             '/engineering/modules/',
             '/engineering/babel/',
             '/engineering/webpack/',
-            '/engineering/RouterLazyLoading/'
+            '/engineering/RouterLazyLoading/',
+            "/engineering/git/"
           ]
         },
         {
@@ -129,7 +136,7 @@ module.exports = {
             "/css/CSS3Animation/",
             "/css/css-basics/"
           ]
-        }
+        },
       ],
       sidebarDepth: 6, // 侧边栏显示2级
     }
